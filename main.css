@@ -1,0 +1,91 @@
+table {
+    border: 0.5px solid;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+th, td {
+    border: 0.5px solid;
+    padding: 2px;
+}
+
+#day {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+}
+
+/* 공통 버튼 스타일 */
+button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 150px;
+}
+
+/* 불러오기 버튼 스타일 */
+#loadButton {
+    background-color: #ff6f32; /* 주황색 */
+    color: white;
+}
+
+#loadButton:hover {
+    background-color: #ff4a00; /* 호버 시 더 진한 주황색 */
+}
+
+/* 간접 버튼 스타일 */
+#parseSubButton {
+    background-color: #ff9800; /* 주황색 */
+    color: white;
+}
+
+#parseSubButton:hover {
+    background-color: #e68900; /* 호버 시 더 진한 주황색 */
+}
+
+/* 직접 버튼 스타일 */
+#parseNetworkButton {
+    background-color: #f44336; /* 빨간색 */
+    color: white;
+}
+
+#parseNetworkButton:hover {
+    background-color: #d32f2f; /* 호버 시 더 진한 빨간색 */
+}
+
+/* 업데이트 버튼 스타일 */
+#updateButton {
+    background-color: #4CAF50; /* 녹색 */
+    color: white;
+}
+
+#updateButton:hover {
+    background-color: #45a049; /* 호버 시 더 진한 녹색 */
+}
+
+/* 복사 버튼 스타일 */
+#copyButton {
+    background-color: #2196F3; /* 파란색 */
+    color: white;
+}
+
+#copyButton:hover {
+    background-color: #1976D2; /* 호버 시 더 진한 파란색 */
+}
+
+button:active {
+    transform: translateY(2px); /* 클릭 시 버튼 눌림 효과 */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* 클릭 시 그림자 감소 */
+}
+

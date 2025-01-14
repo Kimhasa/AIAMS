@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예방 정비표</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="header-buttons">
+    <button class="btn red">
+        <a href="member.html">인원 입력</a>
+    </button>
+    <button class="btn orange">
+        <a href="schedule.html">일과시간 지정</a>
+    </button>
+    <button class="btn orange">
+        <a href="memberCheck.html">인원 배정</a>
+    </button>
+    <button class="btn blue">
+        <a href="work.html">작업지시</a>
+    </button>
+    <button class="btn green">
+        <a href="download.html">내려받기</a>
+    </button>
+    <button class="btn black">
+        <a href="manual.html">설명서</a>
+    </button>
+</div>
+
+<div class="input-section">
+    <h2>인원 입력</h2>
+    <div class="input-group">
+        <label for="totalPersonnel">총 인원:</label>
+        <input type="number" id="totalPersonnel" value="" min="1">
+    </div>
+    <div class="action-buttons">
+        <button class="btn blue" id="addBtn">인원추가</button>
+        <button class="btn red" id="deleteBtn">삭제</button>
+        <button class="btn green" id="saveBtn">저장</button>
+    </div>
+</div>
+
+<div>
+    <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
+</div>
+
+<table border="1" class="personnel-table">
+    <thead>
+    <tr>
+        <th>순번</th>
+        <th>이름</th>
+        <th>간부 여부</th>
+        <th>삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 테이블 행은 JavaScript로 동적 생성 -->
+    </tbody>
+</table>
+
+<script src="script.js"></script>
+<script src="member.js"></script>
+</body>
+</html>

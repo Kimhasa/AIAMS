@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+    <!-- main.js 스크립트 파일 로드 -->
+    <script src="main.js"></script>
+    <div>
+        <span>델리스 입력</span>
+    </div>
+    <input id="name" type="number" value="">
+    <button id="loadButton" onclick="load()">
+        불러오기
+    </button>
+    <br>
+    <button id="parseSubButton" onclick="parseSub()">
+        간 접
+    </button>
+    <button id="parseNetworkButton" onclick="parseNetwork()">
+        직 접
+    </button>
+    <h1 id="title">이름 입력하고 불러오기</h1>
+    <br>
+    <button id="updateButton" onclick="updateResult()">
+        업데이트
+    </button>
+    <button id="copyButton" onclick="copy()">
+        복사
+    </button>
+    <br>
+    <div id="day">
+        <button onclick="prev()">
+            이전
+        </button>
+        <div id="dayvalue">1</div>
+        <button onclick="next()">
+            다음
+        </button>
+    </div>
+
+    <!-- result 요소 추가 -->
+    <div id="result"></div>
+</body>
+</html>

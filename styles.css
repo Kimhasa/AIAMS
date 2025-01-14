@@ -1,0 +1,126 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+}
+
+.header-buttons {
+    margin-bottom: 40px;
+    margin-top: 100px;
+}
+
+.btn {
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+}
+
+.btn.red { background-color: #ff4d4d; }
+.btn.orange { background-color: #ffa500; }
+.btn.blue { background-color: #007bff; }
+.btn.skyblue { background-color: #00bfff; }
+.btn.green { background-color: #28a745; }
+.btn.black { background-color: #333; }
+
+.calendar-container {
+    margin: 20px 0;
+}
+
+.nav-btn {
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#calendar {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+.edit-buttons {
+    margin-top: 10px;
+}
+
+
+/**/
+
+.header-buttons {
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+}
+
+.btn.red { background-color: #ff4d4d; }
+.btn.orange { background-color: #ffa500; }
+.btn.blue { background-color: #4da6ff; }
+.btn.skyblue { background-color: #87ceeb; }
+.btn.green { background-color: #4caf50; }
+.btn.black { background-color: #333; }
+
+.input-section {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin: 10px 0;
+}
+
+.input-group label {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+input[type="number"] {
+    padding: 5px;
+    width: 100px;
+    font-size: 16px;
+}
+
+.action-buttons {
+    margin: 10px 0;
+}
+
+.personnel-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.personnel-table th, .personnel-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
