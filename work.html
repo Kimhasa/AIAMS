@@ -3,168 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예방 정비표</title>
+    <title>일정표 생성기</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="header-buttons">
-    <button class="btn red">인원 입력</button>
-    <button class="btn orange">일과시간 지정</button>
-    <button class="btn blue">작업지시</button>
-    <button class="btn green">내려받기</button>
-    <button class="btn black">설명서</button>
-</div>
+<script src="header.js"></script>
 
-<h2 id="current-date"></h2> <!-- 현재 월 표시 -->
-<h3 id="selected-date">선택된 날짜: 없음</h3> <!-- 선택된 날짜 표시 -->
-<div id="calendar"></div>
+<header>
+    <h1>일정표 생성기</h1>
+</header>
 
-<div class="table-container">
-    <button id="today-btn">오늘 날짜로 이동</button> <!-- 오늘 날짜로 이동 버튼 -->
-    <button id="prev" class="nav-btn">이전</button>
-    <button id="next" class="nav-btn">다음</button>
-    <div class="edit-buttons">
-        <button class="btn blue">수정</button>
-        <button class="btn red">삭제</button>
-    </div>
-    <table>
-        <thead>
-        <tr>
-            <th>루틴번호</th>
-            <th>작업코드</th>
-            <th>작업내용</th>
-            <th>시작시간</th>
-            <th>종료시간</th>
-            <th>주작업자</th>
-            <th>보조작업자</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-</div>
+<main>
+    <section>
+        <label for="workMonth">월 선택:</label>
+        <!-- 기존 날짜 선택기에서 달 선택기로 변경 -->
+        <input type="month" id="workMonth">
+    </section>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const currentDateElem = document.getElementById("current-date");
-        const calendarElem = document.getElementById("calendar");
-        const selectedDateElem = document.getElementById("selected-date");
-        const today = new Date();
+    <section>
+        <button id="pasteDataBtn">입력</button>
+    </section>
 
-        let selectedDate = new Date(today); // 처음에는 오늘 날짜를 선택
+    <section>
+        <h2>일정표</h2>
+        <div id="result"></div>
+    </section>
+</main>
 
-        function renderCalendar(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            currentDateElem.textContent = `${year}년 ${month + 1}월`;
-
-            calendarElem.innerHTML = "";
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
-
-            let html = "<table><tr>";
-            const days = ["일", "월", "화", "수", "목", "금", "토"];
-            for (const day of days) {
-                html += `<th>${day}</th>`;
-            }
-            html += "</tr><tr>";
-
-            for (let i = 0; i < firstDay; i++) {
-                html += "<td></td>";
-            }
-
-            for (let date = 1; date <= lastDate; date++) {
-                if ((firstDay + date - 1) % 7 === 0) {
-                    html += "</tr><tr>";
-                }
-
-                const isToday =
-                    today.getFullYear() === year &&
-                    today.getMonth() === month &&
-                    today.getDate() === date;
-
-                const isSelected =
-                    selectedDate.getFullYear() === year &&
-                    selectedDate.getMonth() === month &&
-                    selectedDate.getDate() === date;
-
-                html += `<td class="${isToday ? 'highlight' : ''} ${isSelected ? 'selected' : ''}"
-                        data-date="${year}-${month + 1}-${date}">${date}</td>`;
-            }
-
-            html += "</tr></table>";
-            calendarElem.innerHTML = html;
-
-            // Add click event listeners to dates
-            document.querySelectorAll("#calendar td").forEach((td) => {
-                td.addEventListener("click", (e) => {
-                    if (e.target.textContent) {
-                        const [y, m, d] = e.target.dataset.date.split("-");
-                        selectedDate = new Date(y, m - 1, d);
-                        renderCalendar(selectedDate); // Re-render the calendar
-                        selectedDateElem.textContent = `선택된 날짜: ${y}년 ${m}월 ${d}일`;
-                    }
-                });
-            });
-
-            // Update the selected date text initially
-            const selectedYear = selectedDate.getFullYear();
-            const selectedMonth = selectedDate.getMonth() + 1;
-            const selectedDay = selectedDate.getDate();
-            selectedDateElem.textContent = `선택된 날짜: ${selectedYear}년 ${selectedMonth}월 ${selectedDay}일`;
-        }
-
-        document.getElementById("prev").addEventListener("click", () => {
-            selectedDate.setMonth(selectedDate.getMonth() - 1);
-            selectedDate.setDate(1); // 이전 달의 1일로 설정
-            renderCalendar(selectedDate);
-        });
-
-        document.getElementById("next").addEventListener("click", () => {
-            selectedDate.setMonth(selectedDate.getMonth() + 1);
-            selectedDate.setDate(1); // 다음 달의 1일로 설정
-            renderCalendar(selectedDate);
-        });
-
-        document.getElementById("today-btn").addEventListener("click", () => {
-            selectedDate = new Date(today); // 오늘 날짜로 설정
-            renderCalendar(selectedDate); // 캘린더 재렌더링
-            selectedDateElem.textContent = `선택된 날짜: ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
-        });
-
-        renderCalendar(selectedDate);
-    });
-
-    // CSS for selected date and today button
-    const style = document.createElement('style');
-    style.innerHTML = `
-  .highlight {
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 5px;
-  }
-  .selected {
-    background-color: #ff6347;
-    color: white;
-    border-radius: 50%;
-    padding: 5px;
-  }
-  #today-btn {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  #today-btn:hover {
-    background-color: #218838;
-  }
-`;
-    document.head.appendChild(style);
-</script>
+<script src="work.js"></script>
 </body>
 </html>
