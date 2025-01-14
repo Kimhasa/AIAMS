@@ -2,9 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예방 정비표</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<script src="header.js"></script>
+
+<div class="input-section">
+    <label for="workDate">날짜 선택:</label>
+    <input type="date" id="workDate">
+    <button id="loadScheduleBtn">불러오기</button>
+    <button id="saveScheduleBtn">저장</button>
+</div>
+
+<div>
+    <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
+</div>
+
+<table border="1" class="personnel-table">
+    <thead>
+    <tr>
+        <th>이름</th>
+        <th>출근</th>
+        <th>주작업자</th>
+        <th>보조작업자</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- 테이블 행은 JavaScript로 동적 생성 -->
+    </tbody>
+</table>
+
+<script src="script.js"></script>
+<script src="member.js"></script>
+<script src="memberCheck.js"></script>
 </body>
 </html>

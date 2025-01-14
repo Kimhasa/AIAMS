@@ -161,36 +161,6 @@
         </tbody>
     </table>
 </div>
-
-<script>
-    function updateStorageInfo() {
-        const totalBytes = new Blob(Object.values(localStorage)).size; // 로컬스토리지 전체 크기 계산
-        const maxMB = 5; // 로컬스토리지 최대 용량
-        let usedSpace = '';
-        let usedPercentage = ((totalBytes / (maxMB * 1024 * 1024)) * 100).toFixed(4); // 사용량 퍼센트 계산
-
-        // 단위 환산
-        if (totalBytes < 1024) {
-            usedSpace = `${totalBytes}Byte`; // 바이트 단위
-        } else if (totalBytes < 1024 * 1024) {
-            usedSpace = `${(totalBytes / 1024).toFixed(2)}KB`; // KB 단위
-        } else {
-            usedSpace = `${(totalBytes / (1024 * 1024)).toFixed(2)}MB`; // MB 단위
-        }
-
-        // 화면에 텍스트 업데이트
-        document.getElementById('storageInfo').textContent =
-            `로컬스토리지 저장 가능 공간 ${usedSpace} / 5MB (${usedPercentage}%)`;
-
-        // 콘솔에 출력
-        console.log(`현재 로컬스토리지 사용량: ${usedSpace} / 5MB (${usedPercentage}%)`);
-    }
-
-    // 페이지 로드 시 자동으로 로컬스토리지 데이터 불러오기 및 저장 공간 업데이트
-    window.addEventListener('DOMContentLoaded', () => {
-        updateStorageInfo(); // 저장 공간 정보 업데이트
-    });
-</script>
 <script src="script.js"></script>
 <script src="schedule.js"></script>
 </body>
