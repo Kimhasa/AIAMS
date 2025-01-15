@@ -15,8 +15,7 @@
 
 <main>
     <section>
-        <label for="workMonth">월 선택:</label>
-        <!-- 기존 날짜 선택기에서 달 선택기로 변경 -->
+        <label for="workMonth">달 선택:</label>
         <input type="month" id="workMonth">
     </section>
 
@@ -25,7 +24,17 @@
     </section>
 
     <section>
-        <h2>일정표</h2>
+        <label for="workDate">날짜 선택:</label>
+        <input type="date" id="workDate">
+    </section>
+
+    <div id="day-navigation">
+        <button id="prevDayBtn">이전</button>
+        <button id="nextDayBtn">다음</button>
+    </div>
+
+    <section>
+        <h2>예방정비 표</h2>
         <div id="result"></div>
     </section>
 </main>

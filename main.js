@@ -1,5 +1,3 @@
-// main.js
-
 // 클립보드에서 데이터를 읽어와 콜백으로 전달하는 함수
 function pasteFromClipboard(callback) {
     navigator.clipboard.read()

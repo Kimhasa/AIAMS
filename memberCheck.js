@@ -64,9 +64,9 @@ document.getElementById('saveScheduleBtn').addEventListener('click', () => {
     const schedule = [];
 
     rows.forEach((row, index) => {
-        const work = row.querySelector('.work-checkbox').checked;
-        const main = row.querySelector('.main-checkbox').checked;
-        const sub = row.querySelector('.sub-checkbox').checked;
+        const work = row.querySelector('.work-checkbox').checked ? 1 : 0;
+        const main = row.querySelector('.main-checkbox').checked ? 1 : 0;
+        const sub = row.querySelector('.sub-checkbox').checked ? 1 : 0;
 
         const membersData = JSON.parse(localStorage.getItem(membersKey)) || [];
         const member = membersData.filter(m => m.removed === 0)[index];
@@ -85,6 +85,7 @@ document.getElementById('saveScheduleBtn').addEventListener('click', () => {
     localStorage.setItem(workScheduleKey, JSON.stringify(scheduleData));
     alert('일정이 저장되었습니다!');
 });
+
 
 // 날짜 변경 시 자동 불러오기
 document.getElementById('workDate').addEventListener('change', (event) => {
