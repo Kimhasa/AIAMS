@@ -14,9 +14,19 @@ function pasteFromClipboard(callback) {
 function parseAndSaveSchedule(data, month) {
     const rows = data.trim().split("\n").map(row => row.split("\t")); // 데이터 파싱
     const rawHeaders = rows[0].map(header => header.trim()); // 헤더 정리
-    const headers = rawHeaders.slice(0, rawHeaders.length - 31); // 날짜(1~31)를 제외한 헤더만 저장
 
-    // 추가 헤더 정의
+    // 헤더에서 날짜 범위 추출 (맨 끝에서부터 1일 찾기)
+    let dateIndex = rawHeaders.length - 1;
+    while (dateIndex >= 0 && rawHeaders[dateIndex] !== "1") {
+        dateIndex--;
+    }
+
+    if (dateIndex < 0) {
+        alert("유효한 날짜 헤더를 찾을 수 없습니다.");
+        return;
+    }
+
+    const headers = rawHeaders.slice(0, dateIndex); // 날짜를 제외한 헤더만 저장
     const extraHeaders = ["시작시간", "종료시간", "주작업자", "보조작업자"];
     const updatedHeaders = [...headers, ...extraHeaders]; // 기존 헤더에 추가 헤더 병합
 
@@ -58,9 +68,6 @@ function parseAndSaveSchedule(data, month) {
 
     alert(`${month}의 일정이 저장되었습니다!`);
 }
-
-
-
 
 // 선택된 날짜의 데이터를 렌더링
 function renderScheduleForDay(month, day) {
@@ -119,6 +126,60 @@ function renderScheduleForDay(month, day) {
     resultContainer.appendChild(table);
 }
 
+function renderOverflowSchedule(month, day) {
+    const overflowKey = `overflow_${month}_${day}`;
+    const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey) || "[]");
+    const overflowContainer = document.getElementById("overflow");
+    overflowContainer.innerHTML = ""; // 기존 결과 초기화
+
+    if (overflowSchedules.length === 0) {
+        overflowContainer.innerHTML = `<p>${day}일에 초과 작업이 없습니다.</p>`;
+        return;
+    }
+
+    // 테이블 생성
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.border = "1";
+
+    // 동적 헤더 생성
+    const headers = Object.keys(overflowSchedules[0]); // 첫 번째 항목의 키를 기준으로 헤더 생성
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.innerText = header.trim();
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.backgroundColor = "#f4f4f4"; // 기존 표와 동일한 헤더 배경색
+        headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // 본문 생성
+    const tbody = document.createElement("tbody");
+    overflowSchedules.forEach(rowData => {
+        const row = document.createElement("tr");
+
+        headers.forEach(header => {
+            const td = document.createElement("td");
+            td.innerText = rowData[header.trim()] || "N/A"; // 헤더에 맞는 데이터 삽입
+            td.style.border = "1px solid #ddd"; // 셀 테두리
+            td.style.padding = "8px"; // 셀 패딩
+            row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    overflowContainer.appendChild(table);
+}
+
 // 날짜 변경 및 렌더링
 function updateDate(date) {
     currentDate = date;
@@ -127,8 +188,10 @@ function updateDate(date) {
     const selectedDay = parseInt(day, 10);
 
     // 선택한 날짜의 데이터를 렌더링
-    renderScheduleForDay(selectedMonth, selectedDay);
+    renderScheduleForDay(selectedMonth, selectedDay); // 예방정비 표 렌더링
+    renderOverflowSchedule(selectedMonth, selectedDay); // 초과작업 표 렌더링
 }
+
 
 // 이전 날짜로 이동
 function prevDay() {
@@ -182,6 +245,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 기본 날짜 설정
     const today = new Date().toISOString().split("T")[0];
-    document.getElementById("workDate").value = today;
+    document.getElementById("workDate").value = today; // 날짜 선택기 기본값 설정
     currentDate = today;
+
+    // 오늘 날짜 데이터 렌더링
+    const [year, month, day] = today.split("-");
+    currentMonth = `${year}-${month}`;
+    const currentDay = parseInt(day, 10);
+    renderScheduleForDay(currentMonth, currentDay); // 예방정비 표 렌더링
+    renderOverflowSchedule(currentMonth, currentDay); // 초과작업 표 렌더링
 });
+
+

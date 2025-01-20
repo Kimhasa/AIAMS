@@ -21,25 +21,163 @@ function getDayOfWeek(dateString) {
     return days[date.getDay()];
 }
 
+// 작업 시간 배정 함수
+function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunchEndTime) {
+    let currentTime = startTime; // 작업 시작 시간
+    let overflowTasks = []; // 초과 작업 저장 배열
+
+    function addMinutes(time, minutes) {
+        const [hours, mins] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hours, mins);
+        date.setMinutes(date.getMinutes() + minutes);
+        return date.toTimeString().slice(0, 5);
+    }
+
+    function calculateMinutesBetween(startTime, endTime) {
+        const [startHours, startMinutes] = startTime.split(":").map(Number);
+        const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+        const start = startHours * 60 + startMinutes;
+        const end = endHours * 60 + endMinutes;
+
+        return end - start;
+    }
+
+    // 작업 배정을 위한 반복
+    for (let i = 0; i < schedule.length; ) {
+        let item = schedule[i];
+        let taskDuration = parseInt(item["시간"], 10); // 작업 소요 시간
+
+        // 남은 시간을 계산하여 초과 작업 여부 판단
+        const remainingTimeToEnd = calculateMinutesBetween(currentTime, endTime);
+        if (taskDuration > remainingTimeToEnd) {
+            overflowTasks.push({ ...item });
+            schedule.splice(i, 1);
+            continue; // 다음 작업으로 이동
+        }
+
+        let taskCompleted = false; // 작업 완료 여부
+
+        while (taskDuration > 0) {
+            // 점심시간 처리
+            if (currentTime >= lunchStartTime && currentTime < lunchEndTime) {
+                currentTime = lunchEndTime;
+            }
+
+            const remainingTime = calculateMinutesBetween(currentTime, endTime);
+
+            if (remainingTime > 0) {
+                const allocatableTime = Math.min(taskDuration, remainingTime);
+                const taskStartTime = currentTime;
+                const taskEndTime = addMinutes(currentTime, allocatableTime);
+
+                // 작업 배정
+                item["시작시간"] = taskStartTime;
+                item["종료시간"] = taskEndTime;
+                taskDuration -= allocatableTime;
+                currentTime = taskEndTime;
+
+                if (taskDuration === 0) {
+                    taskCompleted = true;
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        // 작업이 끝나지 않은 경우 초과 작업으로 분류
+        if (!taskCompleted && taskDuration > 0) {
+            const overflowTask = { ...item };
+            overflowTask["시간"] = taskDuration;
+            overflowTasks.push(overflowTask);
+            schedule.splice(i, 1); // 초과 작업에서 제거
+        } else {
+            i++;
+        }
+    }
+
+    // 초과 작업을 기존 **시작 시간부터** 재배정
+    let overflowStartTime = startTime; // 초과 작업 시작 시간 초기화
+    overflowTasks.forEach(task => {
+        let taskDuration = parseInt(task["시간"], 10);
+
+        while (taskDuration > 0) {
+            // 점심시간 체크
+            if (overflowStartTime >= lunchStartTime && overflowStartTime < lunchEndTime) {
+                overflowStartTime = lunchEndTime;
+            }
+
+            const remainingTime = calculateMinutesBetween(overflowStartTime, endTime);
+
+            if (remainingTime > 0) {
+                const allocatableTime = Math.min(taskDuration, remainingTime);
+                const taskStartTime = overflowStartTime;
+                const taskEndTime = addMinutes(overflowStartTime, allocatableTime);
+
+                // 작업 배정
+                task["시작시간"] = taskStartTime;
+                task["종료시간"] = taskEndTime;
+                taskDuration -= allocatableTime;
+                overflowStartTime = taskEndTime;
+
+                if (taskDuration === 0) {
+                    break;
+                }
+            } else {
+                break; // 더 이상 배정할 시간이 없으면 루프 종료
+            }
+        }
+    });
+
+    return overflowTasks; // 최종 초과 작업 반환
+}
+
+
 // 저장 버튼 클릭 이벤트
-document.getElementById('saveBtn').addEventListener('click', function () {
-    const date = document.getElementById('date').value;
-    const startTime = document.getElementById('startTime').value;
-    const endTime = document.getElementById('endTime').value;
-    const lunchStartTime = document.getElementById('lunchStartTime').value;
-    const lunchEndTime = document.getElementById('lunchEndTime').value;
-    const holidayChecked = document.getElementById('holiday').checked;
+document.getElementById("saveBtn").addEventListener("click", function () {
+    const date = document.getElementById("date").value;
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
+    const lunchStartTime = document.getElementById("lunchStartTime").value;
+    const lunchEndTime = document.getElementById("lunchEndTime").value;
+    const holidayChecked = document.getElementById("holiday").checked;
 
     if (!date) {
-        alert('날짜를 입력하세요!');
+        alert("날짜를 입력하세요!");
         return;
     }
 
-    // 공휴일이면 일과시간 비우기
-    const start = holidayChecked ? '' : startTime;
-    const end = holidayChecked ? '' : endTime;
+    const start = holidayChecked ? "" : startTime;
+    const end = holidayChecked ? "" : endTime;
 
-    // 새 데이터 추가
+    const schedulesData = JSON.parse(localStorage.getItem("schedules")) || {};
+    const month = date.slice(0, 7); // yyyy-MM
+    const day = parseInt(date.slice(-2), 10); // 1~31
+
+    if (!schedulesData[month]) {
+        schedulesData[month] = {};
+    }
+
+    if (!schedulesData[month][day]) {
+        schedulesData[month][day] = [];
+    }
+
+    const dailySchedule = schedulesData[month][day];
+    let overflowTasks = [];
+
+    if (!holidayChecked) {
+        overflowTasks = distributeTaskTimes(dailySchedule, start, end, lunchStartTime, lunchEndTime);
+    } else {
+        // 공휴일인 경우 시작시간 및 종료시간 초기화
+        dailySchedule.forEach(item => {
+            item["시작시간"] = "";
+            item["종료시간"] = "";
+        });
+    }
+
+    const existingEntryIndex = scheduleData.findIndex(entry => entry.date === date);
     const newEntry = {
         date,
         day: getDayOfWeek(date),
@@ -48,17 +186,29 @@ document.getElementById('saveBtn').addEventListener('click', function () {
         lunchStart: lunchStartTime,
         lunchEnd: lunchEndTime,
         holiday: holidayChecked ? 1 : 0,
-        tasks: []
     };
 
-    scheduleData.push(newEntry); // 데이터 추가
+    if (existingEntryIndex > -1) {
+        scheduleData[existingEntryIndex] = newEntry;
+    } else {
+        scheduleData.push(newEntry);
+    }
 
-    // 추가 후 내림차순 정렬 (날짜 기준)
-    scheduleData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    schedulesData[month][day] = dailySchedule;
+    localStorage.setItem("schedules", JSON.stringify(schedulesData));
 
-    saveToLocalStorage(); // 로컬스토리지에 저장
-    updateTable(); // 테이블 업데이트
+    if (overflowTasks.length > 0) {
+        const overflowKey = `overflow_${month}_${day}`;
+        const existingOverflowTasks = JSON.parse(localStorage.getItem(overflowKey)) || [];
+        localStorage.setItem(overflowKey, JSON.stringify([...existingOverflowTasks, ...overflowTasks]));
+        alert(`작업 시간이 초과되었습니다. 초과 작업은 '${overflowKey}' 키에 저장되었습니다.`);
+    }
+
+    saveToLocalStorage();
+    updateTable();
 });
+
+
 
 // 테이블 업데이트 함수
 function updateTable(filteredData = null) {
