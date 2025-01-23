@@ -8,13 +8,22 @@ function makeCellFile(table, filename) {
     // workbook 생성
     let wb = XLSX.utils.book_new();
 
-    console.log(table);
-
     // sheet 생성
     for (let i = 0; i < table.length; i++) {
+        const sheet = XLSX.utils.aoa_to_sheet(table[i]);;
+        // 칸을 병합할 필요가 있으면 병합함.
+        sheet["!merges"] = [];
+        for (let j = 0; j < table[i].length; j++)
+            if (table[i][j].length == 1) {
+                let size = 3;
+                if (j + 1 < table[i].length)
+                    size = Math.max(size, table[i][j + 1].length);
+                sheet["!merges"].push({ s: { r: j, c: 0 }, e: { r: j, c: size - 1 } });
+            }
+
         const sheetName = `${i + 1}일`;
         wb.SheetNames.push(sheetName);
-        wb.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(table[i]);
+        wb.Sheets[sheetName] = sheet;
     }
 
     // 엑셀 파일 쓰기
@@ -39,8 +48,7 @@ function makeTestCellFile() {
     ]], "테스트파일.cell");
 }
 
-function downloadScheduleFile(year, month) {
-    // LocalStorage에서 스케줄 데이터 가져오기
+function schedule2sheet(year, month) {
     const year_month = `${year}-${String(month).padStart(2, "0")}`;
     const schedules = JSON.parse(localStorage.getItem("schedules") || "{}");
     const scheduleForMonth = schedules[year_month] || {};
@@ -64,11 +72,10 @@ function downloadScheduleFile(year, month) {
         sheets.push(data);
     }
 
-    makeCellFile(sheets, `${year_month} 예방정비표.xlsx`);
+    return sheets;
 }
 
-function downloadOverflowScheduleFile(year, month) {
-    // LocalStorage에서 스케줄 데이터 가져오기
+function overflowSchedules2sheet(year, month) {
     const year_month = `${year}-${String(month).padStart(2, "0")}`;
     const lastDay = new Date(year, month, 0).getDate();
 
@@ -92,10 +99,43 @@ function downloadOverflowScheduleFile(year, month) {
         sheets.push(data);
     }
 
-    makeCellFile(sheets, `${year_month} 초과작업표.xlsx`);
+    return sheets;
 }
 
-function downloadFiles(year = 2025, month = 1) {
-    downloadScheduleFile(year, month);
-    downloadOverflowScheduleFile(year, month);
+function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
+    const lastDay = new Date(year, month, 0).getDate();
+
+    const sheets = [];
+    for (let day = 1; day <= lastDay; day++) {
+        const sheet = [];
+
+        sheet.push([`${day}일 ${title1}`]);
+        sheet1[day - 1].forEach(row => sheet.push(row));
+
+        sheet.push([`${day}일 ${title2}`]);
+        sheet2[day - 1].forEach(row => sheet.push(row));
+
+        sheets.push(sheet);
+    }
+
+    return sheets;
+}
+
+function download2File(year = 2025, month = 1) {
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
+}
+
+function download1File(year = 2025, month = 1) {
+    const year_month = `${year}-${String(month).padStart(2, "0")}`;
+
+    const title1 = "예방정비 내용"
+    const sheet1 = schedule2sheet(year, month);
+
+    const title2 = "초과작업 내용"
+    const sheet2 = overflowSchedules2sheet(year, month);
+
+    const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
+
+    makeCellFile(sheet, `${year_month} 표.xlsx`);
 }
