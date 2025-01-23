@@ -59,7 +59,7 @@ function schedule2sheet(year, month) {
     for (let day = 1; day <= lastDay; day++) {
         const scheduleForDay = scheduleForMonth[`${day}`] || [];
         if (scheduleForDay.length === 0) {
-            sheets.push([[`${day}일에 예정된 점검 항목이 없습니다.`]]);
+            sheets.push([[`${month}월 ${day}일에 예정된 점검 항목이 없습니다.`]]);
             continue;
         }
 
@@ -85,7 +85,7 @@ function overflowSchedules2sheet(year, month) {
         const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey) || "[]");
 
         if (overflowSchedules == null || overflowSchedules.length === 0) {
-            sheets.push([[`${day}일에 예정된 점검 항목이 없습니다.`]]);
+            sheets.push([[`${month}월 ${day}일에 초과작업이 없습니다.`]]);
             continue;
         }
 
@@ -109,10 +109,10 @@ function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
     for (let day = 1; day <= lastDay; day++) {
         const sheet = [];
 
-        sheet.push([`${day}일 ${title1}`]);
+        sheet.push([`${month}월 ${day}일 ${title1}`]);
         sheet1[day - 1].forEach(row => sheet.push(row));
 
-        sheet.push([`${day}일 ${title2}`]);
+        sheet.push([`${month}월 ${day}일 ${title2}`]);
         sheet2[day - 1].forEach(row => sheet.push(row));
 
         sheets.push(sheet);
@@ -122,13 +122,12 @@ function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
 }
 
 function download2File(year = 2025, month = 1) {
-    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
-    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
+    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.cell`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.cell`);
 }
 
 function download1File(year = 2025, month = 1) {
-    const year_month = `${year}-${String(month).padStart(2, "0")}`;
-
     const title1 = "예방정비 내용"
     const sheet1 = schedule2sheet(year, month);
 
@@ -137,5 +136,6 @@ function download1File(year = 2025, month = 1) {
 
     const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
 
-    makeCellFile(sheet, `${year_month} 표.xlsx`);
+    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
+    makeCellFile(sheet, `${year_month} 표.cell`);
 }
