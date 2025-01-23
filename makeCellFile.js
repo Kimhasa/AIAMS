@@ -3,19 +3,28 @@
 // <script src="xlsx.mini.min.js"></script>
 // <script src="makeCellFile.js"></script>
 
-//table = 이차원 배열, filename = 파일명.확장자
+//table = 삼차원 배열, filename = 파일명.확장자
 function makeCellFile(table, filename) {
     // workbook 생성
     let wb = XLSX.utils.book_new();
 
     // sheet 생성
-    wb.SheetNames.push("sheet 1");
+    for (let i = 0; i < table.length; i++) {
+        const sheet = XLSX.utils.aoa_to_sheet(table[i]);;
+        // 칸을 병합할 필요가 있으면 병합함.
+        sheet["!merges"] = [];
+        for (let j = 0; j < table[i].length; j++)
+            if (table[i][j].length == 1) {
+                let size = 3;
+                if (j + 1 < table[i].length)
+                    size = Math.max(size, table[i][j + 1].length);
+                sheet["!merges"].push({ s: { r: j, c: 0 }, e: { r: j, c: size - 1 } });
+            }
 
-    // 배열 데이터로 시트 데이터 생성
-    let ws = XLSX.utils.aoa_to_sheet(table);
-
-    // 시트 데이터를 시트에 넣기 ( 시트 명이 없는 시트인경우 첫번째 시트에 데이터가 들어감 )
-    wb.Sheets["sheet 1"] = ws;
+        const sheetName = `${i + 1}일`;
+        wb.SheetNames.push(sheetName);
+        wb.Sheets[sheetName] = sheet;
+    }
 
     // 엑셀 파일 쓰기
     let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
@@ -28,13 +37,105 @@ function makeCellFile(table, filename) {
         return buf;
     }
     // 파일 다운로드
-    saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), '엑셀_다운로드.xlsx');
+    saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), filename);
 }
 
 function makeTestCellFile() {
-    makeCellFile([
+    makeCellFile([[
         ["작업내용", "번호"],
         ["어쩌구 점검", "1"],
         ["저쩌구 점검", "2"],
-    ], "테스트파일.cell");
+    ]], "테스트파일.cell");
+}
+
+function schedule2sheet(year, month) {
+    const year_month = `${year}-${String(month).padStart(2, "0")}`;
+    const schedules = JSON.parse(localStorage.getItem("schedules") || "{}");
+    const scheduleForMonth = schedules[year_month] || {};
+    const scheduleHeaders = scheduleForMonth.headers || [];
+    const lastDay = new Date(year, month, 0).getDate();
+
+    const sheets = [];
+    for (let day = 1; day <= lastDay; day++) {
+        const scheduleForDay = scheduleForMonth[`${day}`] || [];
+        if (scheduleForDay.length === 0) {
+            sheets.push([[`${month}월 ${day}일에 예정된 점검 항목이 없습니다.`]]);
+            continue;
+        }
+
+        const data = [scheduleHeaders];
+        scheduleForDay.forEach(rowData => {
+            const row = scheduleHeaders.map(header => rowData[header.trim()] || "N/A");
+            data.push(row);
+        });
+
+        sheets.push(data);
+    }
+
+    return sheets;
+}
+
+function overflowSchedules2sheet(year, month) {
+    const year_month = `${year}-${String(month).padStart(2, "0")}`;
+    const lastDay = new Date(year, month, 0).getDate();
+
+    const sheets = [];
+    for (let day = 1; day <= lastDay; day++) {
+        const overflowKey = `overflow_${year_month}_${day}`;
+        const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey) || "[]");
+
+        if (overflowSchedules == null || overflowSchedules.length === 0) {
+            sheets.push([[`${month}월 ${day}일에 초과작업이 없습니다.`]]);
+            continue;
+        }
+
+        const headers = Object.keys(overflowSchedules[0]);
+        const data = [headers];
+        overflowSchedules.forEach(rowData => {
+            const row = headers.map(header => rowData[header.trim()] || "N/A");
+            data.push(row);
+        });
+
+        sheets.push(data);
+    }
+
+    return sheets;
+}
+
+function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
+    const lastDay = new Date(year, month, 0).getDate();
+
+    const sheets = [];
+    for (let day = 1; day <= lastDay; day++) {
+        const sheet = [];
+
+        sheet.push([`${month}월 ${day}일 ${title1}`]);
+        sheet1[day - 1].forEach(row => sheet.push(row));
+
+        sheet.push([`${month}월 ${day}일 ${title2}`]);
+        sheet2[day - 1].forEach(row => sheet.push(row));
+
+        sheets.push(sheet);
+    }
+
+    return sheets;
+}
+
+function download2File(year = 2025, month = 1) {
+    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.cell`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.cell`);
+}
+
+function download1File(year = 2025, month = 1) {
+    const title1 = "예방정비 내용"
+    const sheet1 = schedule2sheet(year, month);
+
+    const title2 = "초과작업 내용"
+    const sheet2 = overflowSchedules2sheet(year, month);
+
+    const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
+
+    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
+    makeCellFile(sheet, `${year_month} 표.cell`);
 }
