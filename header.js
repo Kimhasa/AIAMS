@@ -13,7 +13,7 @@ let header = `
         <a href="memberCheck.html">인원 배정</a>
     </button>
     <button class="btn green">
-        <a href="makeTestCellFile.html">내려받기</a>
+        <a href="download.html">내려받기</a>
     </button>
     <button class="btn black">
         <a href="manual.html">설명서</a>
