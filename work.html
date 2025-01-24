@@ -7,42 +7,44 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<script src="header.js"></script>
+    <script src="header.js"></script>
+    <script src="script.js"></script>
+    <script src="work.js"></script>
 
-<header>
-    <h1>일정표 생성기</h1>
-</header>
+    <header>
+        <h2>일정표 생성기</h2>
+    </header>
 
-<main>
-    <section>
-        <label for="workMonth">달 선택:</label>
-        <input type="month" id="workMonth">
-    </section>
+    <main>
+        <section>
+            <label for="workMonth">달 선택:</label>
+            <input type="month" id="workMonth">
+        </section>
 
-    <section>
-        <button id="pasteDataBtn">입력</button>
-    </section>
+        <section>
+            <button id="pasteDataBtn">입력</button>
+        </section>
 
-    <section>
-        <label for="workDate">날짜 선택:</label>
-        <input type="date" id="workDate">
-    </section>
+        <section>
+            <label for="workDate">날짜 선택:</label>
+            <input type="date" id="workDate">
+        </section>
 
-    <div id="day-navigation">
-        <button id="prevDayBtn">이전</button>
-        <button id="nextDayBtn">다음</button>
-    </div>
-
-    <section>
-        <h2>예방정비 표</h2>
-        <div id="result"></div>
-    </section>
-    <section>
-        <h2>초과작업 표</h2>
-        <div id="overflow"></div>
-    </section>
-</main>
-
-<script src="work.js"></script>
+        <div id="day-navigation">
+            <button id="prevDayBtn">이전</button>
+            <button id="nextDayBtn">다음</button>
+        </div>
+        <div>
+            <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
+        </div>
+        <section>
+            <h2>예방정비 표</h2>
+            <div id="result"></div>
+        </section>
+        <section>
+            <h2>초과작업 표</h2>
+            <div id="overflow"></div>
+        </section>
+    </main>
 </body>
 </html>

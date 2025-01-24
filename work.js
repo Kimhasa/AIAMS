@@ -86,7 +86,7 @@ function renderScheduleForDay(month, day) {
 
     // 테이블 생성
     const table = document.createElement("table");
-    table.style.width = "100%";
+    table.style.width = "80%";
     table.style.borderCollapse = "collapse";
     table.border = "1";
 
@@ -139,7 +139,7 @@ function renderOverflowSchedule(month, day) {
 
     // 테이블 생성
     const table = document.createElement("table");
-    table.style.width = "100%";
+    table.style.width = "80%";
     table.style.borderCollapse = "collapse";
     table.border = "1";
 

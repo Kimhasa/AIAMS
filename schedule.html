@@ -3,97 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>예방 정비표</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
-
-        .header-buttons {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .header-buttons .btn {
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            color: white;
-        }
-
-        .btn.red { background-color: #ff4d4d; }
-        .btn.orange { background-color: #ffa500; }
-        .btn.blue { background-color: #4da6ff; }
-        .btn.green { background-color: #4caf50; }
-        .btn.black { background-color: #333333; }
-
-        .input-section {
-            margin-bottom: 20px;
-        }
-
-        .input-section h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .input-group, .action-buttons {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .input-group input {
-            margin: 5px;
-            padding: 5px;
-            font-size: 14px;
-        }
-
-        .table-container {
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0 auto;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        .holiday {
-            color: red;
-            font-weight: bold;
-        }
-
-        .delete-btn {
-            color: red;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .filter-section {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .filter-section input {
-            padding: 5px;
-            font-size: 14px;
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <body>
 <!-- 헤더 -->
@@ -132,7 +43,7 @@
 </div>
 
 <div class="filter-section">
-    <label for="filterDate">날짜별 조회:</label>
+    <label for="filterDate">월별 조회:</label>
     <input type="date" id="filterDate">
     <button class="btn blue" id="filterBtn">조회</button>
     <button class="btn red" id="resetBtn">초기화</button>

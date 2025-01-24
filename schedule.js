@@ -231,7 +231,7 @@ function updateTable(filteredData = null) {
                 <input type="checkbox" ${item.holiday ? 'checked' : ''} onchange="updateAndSaveField(${index}, 'holiday', this.checked ? 1 : 0)">
             </td>
             <td>
-                <span class="delete-btn" onclick="deleteRow(${index})">삭제</span>
+                <span class="btn red" onclick="deleteRow(${index})">삭제</span>
             </td>
         `;
         tbody.appendChild(row);
