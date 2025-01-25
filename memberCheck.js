@@ -71,52 +71,63 @@ function updateSchedules(date) {
     // 일정표와 초과 일정표 개수 계산
     const scheduleCount = dailySchedules.length > 0 ? 1 : 0;
     const overflowCount = overflowSchedules.length > 0 ? 1 : 0;
-    const tableCount = scheduleCount + overflowCount;
 
     // 모든 작업자 데이터를 가져오기
     const members = JSON.parse(localStorage.getItem(membersKey)) || [];
     const mainWorkers = workScheduleData.filter(s => s.main === 1).map(s => members.find(m => m.id === s.idx));
     const subWorkers = workScheduleData.filter(s => s.sub === 1).map(s => members.find(m => m.id === s.idx));
 
-    // 유효성 검사: 주작업자와 보조작업자가 충분한지 확인
-    if (mainWorkers.length < tableCount) {
-        alert(`주작업자가 최소 ${tableCount}명 이상 필요합니다.`);
+    // 유효성 검사: 최소 작업자 수 확인
+    if (mainWorkers.length < 1 || subWorkers.length < 1) {
+        alert(`주작업자와 보조작업자가 최소 1명 이상 필요합니다.`);
         return;
     }
 
-    // 주작업자와 보조작업자 배치
-    for (let i = 0; i < tableCount; i++) {
-        const mainWorker = mainWorkers[i] ? mainWorkers[i].name : "미지정";
+    // 주작업자와 보조작업자 균등 분배
+    const totalMainWorkers = mainWorkers.length;
+    const totalSubWorkers = subWorkers.length;
 
-        // 보조작업자 그룹 나누기 (남은 보조작업자만큼만 배치)
-        const subWorkerGroup = subWorkers.slice(i * 2, (i + 1) * 2); // 2명씩 가져오기
-        const subWorkerNames = subWorkerGroup.map(worker => worker?.name).join(", ") || "미지정";
+    const mainWorkersForDaily = mainWorkers.slice(0, Math.ceil(totalMainWorkers / 2)).map(worker => worker?.name || "미지정");
+    const mainWorkersForOverflow = mainWorkers.slice(Math.ceil(totalMainWorkers / 2)).map(worker => worker?.name || "미지정");
 
-        // 기존 작업표: 첫 번째 표
-        if (i === 0 && scheduleCount > 0) {
-            dailySchedules.forEach(entry => {
-                entry["주작업자"] = mainWorker;
-                entry["보조작업자"] = subWorkerNames;
-            });
-        }
+    const subWorkersForDaily = subWorkers.slice(0, Math.ceil(totalSubWorkers / 2)).map(worker => worker?.name || "미지정");
+    const subWorkersForOverflow = subWorkers.slice(Math.ceil(totalSubWorkers / 2)).map(worker => worker?.name || "미지정");
 
-        // 초과 작업표: 두 번째 표
-        if (i === 1 && overflowCount > 0) {
-            overflowSchedules.forEach(entry => {
-                entry["주작업자"] = mainWorker;
-                entry["보조작업자"] = subWorkerNames;
-            });
-        }
+    // 기존표 작업자 배치
+    if (scheduleCount > 0) {
+        dailySchedules.forEach(entry => {
+            entry["주작업자"] = mainWorkersForDaily.join(", "); // 기존표 주작업자
+            entry["보조작업자"] = subWorkersForDaily.join(", "); // 기존표 보조작업자
+        });
+    }
+
+    // 초과표 작업자 배치
+    if (overflowCount > 0 || mainWorkersForOverflow.length > 0 || subWorkersForOverflow.length > 0) {
+        overflowSchedules.forEach(entry => {
+            entry["주작업자"] = mainWorkersForOverflow.join(", "); // 초과표 주작업자
+            entry["보조작업자"] = subWorkersForOverflow.join(", "); // 초과표 보조작업자
+        });
+    } else {
+        // 초과표가 필요 없는 경우, 삭제
+        localStorage.removeItem(overflowKey);
     }
 
     // 저장
-    localStorage.setItem(overflowKey, JSON.stringify(overflowSchedules));
     schedules[month][day] = dailySchedules;
     localStorage.setItem(schedulesKey, JSON.stringify(schedules));
+    if (overflowSchedules.length > 0) {
+        localStorage.setItem(overflowKey, JSON.stringify(overflowSchedules));
+    }
 
     console.log("기존 작업표:", dailySchedules);
-    console.log("초과 작업표:", overflowSchedules);
+    if (overflowSchedules.length > 0) {
+        console.log("초과 작업표:", overflowSchedules);
+    } else {
+        console.log("초과 작업표 없음.");
+    }
 }
+
+
 
 // 일정 저장
 document.getElementById('saveScheduleBtn').addEventListener('click', () => {
@@ -152,8 +163,27 @@ document.getElementById('saveScheduleBtn').addEventListener('click', () => {
     // schedules 데이터 업데이트
     updateSchedules(date, schedule);
 
+    updateStorageInfo();  // 저장 공간 정보 업데이트
     alert('일정이 저장되었습니다!');
 });
+
+// 인원 배정 데이터 초기화 버튼 클릭 이벤트
+document.getElementById('resetBtn').addEventListener('click', function () {
+    if (confirm('정말로 모든 인원 배정 데이터를 초기화하시겠습니까?')) {
+        // 로컬스토리지에서 workSchedule 키 삭제
+        localStorage.removeItem(workScheduleKey);
+
+        // 테이블 초기화
+        const tbody = document.querySelector('.personnel-table tbody');
+        tbody.innerHTML = '';
+
+        // 저장 공간 정보 업데이트
+        updateStorageInfo();
+
+        alert('모든 인원 배정 데이터가 초기화되었습니다!');
+    }
+});
+
 
 // 날짜 변경 시 자동 불러오기
 document.getElementById('workDate').addEventListener('change', (event) => {

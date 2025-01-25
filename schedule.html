@@ -7,72 +7,67 @@
     <title>예방 정비표</title>
 </head>
 <body>
-<!-- 헤더 -->
-<script src="header.js"></script>
-<!-- 헤더 -->
-
-<div class="input-section">
-    <h2>일과시간 지정</h2>
+    <script src="header.js"></script>
+    <script src="script.js" defer></script>
+    <script src="schedule.js" defer></script>
+    <div class="input-section">
+        <h2>일과시간 지정</h2>
+        <div class="input-group">
+            <label for="date">날짜 : </label>
+            <input type="date" id="date">
+            <label for="startTime">일과 시작 : </label>
+            <input type="time" id="startTime">
+            <label for="endTime">일과 종료 : </label>
+            <input type="time" id="endTime">
+        </div>
+        <div class="input-group">
+            <label for="lunchStartTime">점심 시작 : </label>
+            <input type="time" id="lunchStartTime">
+            <label for="lunchEndTime">점심 종료 : </label>
+            <input type="time" id="lunchEndTime">
+        </div>
+        <div class="input-group">
+            <label for="holiday">공휴일</label>
+            <input type="checkbox" id="holiday">
+            <label for="lunchTime">점심시간 체크</label>
+            <input type="checkbox" id="lunchTime">
+        </div>
+        <div class="action-buttons">
+            <button class="btn green" id="saveBtn">저장</button>
+        </div>
+    </div>
+    <div class="filter-section">
+        <label for="filterDate">월별 조회 : </label>
+        <input type="month" id="filterDate">
+    </div>
     <div class="input-group">
-        <label for="date">날짜</label>
-        <input type="date" id="date">
-
-        <label for="startTime">일과 시작</label>
-        <input type="time" id="startTime">
-
-        <label for="endTime">일과 종료</label>
-        <input type="time" id="endTime">
+        <button class="btn blue" id="filterBtn">조회</button>
+        <button class="btn green" id="viewAllBtn">전체 조회</button>
+        <button class="btn red" id="resetBtn">일과시간 데이터 초기화</button>
     </div>
-
-    <div class="input-group">
-        <label for="lunchStartTime">점심 시작</label>
-        <input type="time" id="lunchStartTime">
-
-        <label for="lunchEndTime">점심 종료</label>
-        <input type="time" id="lunchEndTime">
+    <div>
+        <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
     </div>
-
-    <div class="input-group">
-        <label for="holiday">공휴일</label>
-        <input type="checkbox" id="holiday">
+    <div class="table-container">
+        <h2>일과시간 목록</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>순번</th>
+                <th>날짜</th>
+                <th>요일</th>
+                <th>일과 시작</th>
+                <th>일과 종료</th>
+                <th>점심 시작</th>
+                <th>점심 종료</th>
+                <th>공휴일</th>
+                <th>삭제 여부</th>
+            </tr>
+            </thead>
+            <tbody id="scheduleTableBody">
+            <!-- 동적으로 추가될 행 -->
+            </tbody>
+        </table>
     </div>
-
-    <div class="action-buttons">
-        <button class="btn green" id="saveBtn">저장</button>
-    </div>
-</div>
-
-<div class="filter-section">
-    <label for="filterDate">월별 조회:</label>
-    <input type="date" id="filterDate">
-    <button class="btn blue" id="filterBtn">조회</button>
-    <button class="btn red" id="resetBtn">초기화</button>
-</div>
-<div>
-    <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
-</div>
-<div class="table-container">
-    <h2>일과시간 목록</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>순번</th>
-            <th>날짜</th>
-            <th>요일</th>
-            <th>일과 시작</th>
-            <th>일과 종료</th>
-            <th>점심 시작</th>
-            <th>점심 종료</th>
-            <th>공휴일</th>
-            <th>삭제 여부</th>
-        </tr>
-        </thead>
-        <tbody id="scheduleTableBody">
-        <!-- 동적으로 추가될 행 -->
-        </tbody>
-    </table>
-</div>
-<script src="script.js"></script>
-<script src="schedule.js"></script>
 </body>
 </html>

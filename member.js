@@ -111,7 +111,6 @@ document.getElementById('resetBtn').addEventListener('click', function () {
     }
 });
 
-
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', () => {
     loadMembersFromStorage();
