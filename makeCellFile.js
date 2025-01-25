@@ -121,13 +121,20 @@ function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
     return sheets;
 }
 
-function download2File(year = 2025, month = 1) {
-    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
+function download2File() {
+    const year_month = document.getElementById("downloadMonth").value;
+    const year = new Date(year_month).getFullYear();
+    const month = new Date(year_month).getMonth();
+
     makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.cell`);
     makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.cell`);
 }
 
-function download1File(year = 2025, month = 1) {
+function download1File() {
+    const year_month = document.getElementById("downloadMonth").value;
+    const year = new Date(year_month).getFullYear();
+    const month = new Date(year_month).getMonth();
+
     const title1 = "예방정비 내용"
     const sheet1 = schedule2sheet(year, month);
 
@@ -136,6 +143,5 @@ function download1File(year = 2025, month = 1) {
 
     const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
 
-    const year_month = `${year}년 ${String(month).padStart(2, "0")}월`;
     makeCellFile(sheet, `${year_month} 표.cell`);
 }
