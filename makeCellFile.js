@@ -136,14 +136,28 @@ function download2File() {
     const year = new Date(year_month).getFullYear();
     const month = new Date(year_month).getMonth() + 1;
 
-    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
-    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
+    const fileFormatNodeList = document.getElementsByName('fileFormat');
+    let fileFormat = "cell";
+    fileFormatNodeList.forEach((node) => {
+        if (node.checked)
+            fileFormat = node.value;
+    })
+
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.${fileFormat}`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.${fileFormat}`);
 }
 
 function download1File() {
     const year_month = document.getElementById("downloadMonth").value;
     const year = new Date(year_month).getFullYear();
     const month = new Date(year_month).getMonth() + 1;
+
+    const fileFormatNodeList = document.getElementsByName('fileFormat');
+    let fileFormat = "cell";
+    fileFormatNodeList.forEach((node) => {
+        if (node.checked)
+            fileFormat = node.value;
+    })
 
     const title1 = "예방정비 내용"
     const sheet1 = schedule2sheet(year, month);
@@ -153,5 +167,5 @@ function download1File() {
 
     const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
 
-    makeCellFile(sheet, `${year_month} 표.xlsx`);
+    makeCellFile(sheet, `${year_month} 표.${fileFormat}`);
 }

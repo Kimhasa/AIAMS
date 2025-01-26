@@ -21,6 +21,10 @@
     <section>
         <label for="downloadMonth">달 선택 : </label>
         <input type="month" id="downloadMonth" value="2025-01">
+        <input type="radio" id="xlsx" name="fileFormat" value="xlsx">
+        <label for="xlsx">.xlsx 파일 (엑셀)</label>
+        <input type="radio" id="cell" name="fileFormat" value="cell" checked>
+        <label for="cell">.cell 파일 (한셀)</label>
     </section>
     <div class="input-group">
         <button class="btn green" onclick="download2File()">예방정비표, 초과일정표 두개로 다운받기</button>
