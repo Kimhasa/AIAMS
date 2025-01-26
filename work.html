@@ -8,31 +8,27 @@
 </head>
 <body>
     <script src="header.js"></script>
-    <script src="script.js"></script>
-    <script src="work.js"></script>
-
+    <script src="script.js" defer></script>
+    <script src="work.js" defer></script>
     <header>
-        <h2>일정표 생성기</h2>
+        <h2>작업지시</h2>
     </header>
-
     <main>
-        <section>
-            <label for="workMonth">달 선택:</label>
+        <div class="input-group">
+            <label for="workMonth">달 선택 : </label>
             <input type="month" id="workMonth">
-        </section>
-
-        <section>
-            <button id="pasteDataBtn">입력</button>
-        </section>
-
-        <section>
-            <label for="workDate">날짜 선택:</label>
+        </div>
+        <div class="input-group">
+            <button class="btn blue" id="pasteDataBtn">입력</button>
+            <button class="btn red" id="resetBtn">작업지시 데이터 초기화</button>
+        </div>
+        <div class="input-group">
+            <label for="workDate">날짜 선택 : </label>
             <input type="date" id="workDate">
-        </section>
-
-        <div id="day-navigation">
-            <button id="prevDayBtn">이전</button>
-            <button id="nextDayBtn">다음</button>
+        </div>
+        <div id="input-group">
+            <button class="btn green" id="prevDayBtn">이전</button>
+            <button class="btn green" id="nextDayBtn">다음</button>
         </div>
         <div>
             <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>

@@ -65,7 +65,7 @@ function parseAndSaveSchedule(data, month) {
     const existingData = JSON.parse(localStorage.getItem("schedules") || "{}");
     existingData[month] = scheduleByDay;
     localStorage.setItem("schedules", JSON.stringify(existingData));
-
+    updateStorageInfo();
     alert(`${month}의 일정이 저장되었습니다!`);
 }
 
@@ -256,4 +256,40 @@ document.addEventListener("DOMContentLoaded", () => {
     renderOverflowSchedule(currentMonth, currentDay); // 초과작업 표 렌더링
 });
 
+// 특정 달의 데이터를 삭제하는 함수
+document.getElementById('resetBtn').addEventListener('click', function () {
+    const selectedMonth = document.getElementById('workMonth').value; // YYYY-MM 형식
+
+    if (!selectedMonth) {
+        alert("먼저 삭제할 달을 선택하세요.");
+        return;
+    }
+
+    if (confirm(`${selectedMonth}의 모든 작업지시 데이터를 초기화하시겠습니까?`)) {
+        // schedules에서 특정 달 데이터 삭제
+        const schedules = JSON.parse(localStorage.getItem('schedules') || '{}');
+
+        if (schedules[selectedMonth]) {
+            delete schedules[selectedMonth]; // 선택된 달 데이터 삭제
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+        } else {
+            alert(`${selectedMonth}의 작업지시 데이터가 존재하지 않습니다.`);
+            return;
+        }
+
+        // overflow_ 데이터 삭제 (특정 달에 해당하는 것만)
+        Object.keys(localStorage)
+            .filter(key => key.startsWith(`overflow_${selectedMonth}`))
+            .forEach(key => localStorage.removeItem(key));
+
+        // 화면에서 결과 초기화
+        document.querySelector('#result').innerHTML = ''; // 예방정비 표 초기화
+        document.querySelector('#overflow').innerHTML = ''; // 초과작업 표 초기화
+
+        // 저장 공간 정보 업데이트
+        updateStorageInfo();
+
+        alert(`${selectedMonth}의 작업지시 데이터가 초기화되었습니다!`);
+    }
+});
 

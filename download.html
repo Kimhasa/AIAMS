@@ -9,23 +9,22 @@
 </head>
 
 <body>
-    <script src="FileSaver.min.js"></script>
-    <script src="xlsx.mini.min.js"></script>
-    <script src="makeCellFile.js"></script>
-    <script src="script.js"></script>
+    <script defer src="FileSaver.min.js"></script>
+    <script defer src="xlsx.mini.min.js"></script>
+    <script defer src="makeCellFile.js"></script>
+    <script defer src="script.js"></script>
     <script src="header.js"></script>
-
     <header>
         <h2>일정표 내려받기</h2>
     </header>
-
     <section>
-        <label for="workMonth">달 선택:</label>
+        <label for="downloadMonth">달 선택 : </label>
         <input type="month" id="downloadMonth" value="2025-01">
     </section>
-
-    <button onclick="download2File()">파일 두개 각각 다운받기</button>
-    <button onclick="download1File()">파일 하나로 다운받기</button>
+    <div class="input-group">
+        <button class="btn green" onclick="download2File()">예방정비표, 초과일정표 두개로 다운받기</button>
+        <button class="btn green" onclick="download1File()">파일 하나로 다운받기</button>
+    </div>
     <div>
         <span id="storageInfo">로컬스토리지 저장 가능 공간 계산 중...</span>
     </div>

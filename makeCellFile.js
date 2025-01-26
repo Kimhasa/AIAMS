@@ -45,7 +45,7 @@ function makeTestCellFile() {
         ["작업내용", "번호"],
         ["어쩌구 점검", "1"],
         ["저쩌구 점검", "2"],
-    ]], "테스트파일.cell");
+    ]], "테스트파일.xlsx");
 }
 
 function schedule2sheet(year, month) {
@@ -126,8 +126,8 @@ function download2File() {
     const year = new Date(year_month).getFullYear();
     const month = new Date(year_month).getMonth() + 1;
 
-    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.cell`);
-    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.cell`);
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
 }
 
 function download1File() {
@@ -143,5 +143,5 @@ function download1File() {
 
     const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
 
-    makeCellFile(sheet, `${year_month} 표.cell`);
+    makeCellFile(sheet, `${year_month} 표.xlsx`);
 }

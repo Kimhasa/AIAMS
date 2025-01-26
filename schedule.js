@@ -12,6 +12,7 @@ function loadFromLocalStorage() {
 // 로컬스토리지에 데이터 저장
 function saveToLocalStorage() {
     localStorage.setItem('schedule', JSON.stringify(scheduleData));
+    updateStorageInfo();  // 저장 공간 정보 업데이트
 }
 
 // 요일 계산 함수
@@ -211,6 +212,7 @@ document.getElementById("saveBtn").addEventListener("click", function () {
 
 
 // 테이블 업데이트 함수
+// 테이블 업데이트 함수 (수정 기능 제거)
 function updateTable(filteredData = null) {
     const tbody = document.getElementById('scheduleTableBody');
     tbody.innerHTML = ''; // 기존 행 초기화
@@ -221,14 +223,14 @@ function updateTable(filteredData = null) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td contenteditable="true" onblur="updateAndSaveField(${index}, 'date', this.textContent.trim())" onkeydown="preventEnter(event)">${item.date}</td>
+            <td>${item.date}</td>
             <td>${item.day}</td>
-            <td contenteditable="true" onblur="updateAndSaveField(${index}, 'start', this.textContent.trim())" onkeydown="preventEnter(event)">${item.start}</td>
-            <td contenteditable="true" onblur="updateAndSaveField(${index}, 'end', this.textContent.trim())" onkeydown="preventEnter(event)">${item.end}</td>
-            <td contenteditable="true" onblur="updateAndSaveField(${index}, 'lunchStart', this.textContent.trim())" onkeydown="preventEnter(event)">${item.lunchStart}</td>
-            <td contenteditable="true" onblur="updateAndSaveField(${index}, 'lunchEnd', this.textContent.trim())" onkeydown="preventEnter(event)">${item.lunchEnd}</td>
+            <td>${item.start}</td>
+            <td>${item.end}</td>
+            <td>${item.lunchStart}</td>
+            <td>${item.lunchEnd}</td>
             <td>
-                <input type="checkbox" ${item.holiday ? 'checked' : ''} onchange="updateAndSaveField(${index}, 'holiday', this.checked ? 1 : 0)">
+                <input type="checkbox" ${item.holiday ? 'checked' : ''}>
             </td>
             <td>
                 <span class="btn red" onclick="deleteRow(${index})">삭제</span>
@@ -256,6 +258,7 @@ function updateAndSaveField(index, field, value) {
     scheduleData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     saveToLocalStorage(); // 로컬스토리지에 저장
+    updateStorageInfo();  // 저장 공간 정보 업데이트
     updateTable(); // 테이블 업데이트 (화면에 반영)
 }
 
@@ -266,22 +269,71 @@ function deleteRow(index) {
     updateTable(); // 테이블 업데이트
 }
 
-// 날짜별 조회 기능
+// 점심시간 체크박스 이벤트
+document.getElementById("lunchTime").addEventListener("change", function () {
+    const lunchStartInput = document.getElementById("lunchStartTime");
+    const lunchEndInput = document.getElementById("lunchEndTime");
+
+    if (this.checked) {
+        lunchStartInput.value = "12:00"; // 24시간 형식으로 값 설정
+        lunchEndInput.value = "13:00";
+    } else {
+        lunchStartInput.value = ""; // 값 초기화
+        lunchEndInput.value = "";
+    }
+});
+
+// 월별 조회 버튼 클릭 이벤트
 document.getElementById('filterBtn').addEventListener('click', function () {
-    const filterDate = document.getElementById('filterDate').value;
+    const filterDate = document.getElementById('filterDate').value; // YYYY-MM 형식
     if (!filterDate) {
-        alert('조회할 날짜를 입력하세요!');
+        alert('조회할 월을 입력하세요!');
         return;
     }
 
-    const filteredData = scheduleData.filter(item => item.date === filterDate);
-    updateTable(filteredData);
+    // 월별 데이터 필터링 (date에서 YYYY-MM 추출)
+    const filteredData = scheduleData.filter(item => item.date.startsWith(filterDate));
+    updateTable(filteredData); // 필터링된 데이터로 테이블 업데이트
 });
 
-// 초기화 버튼 클릭 시 전체 데이터 표시
+
+// 인원 데이터 초기화 버튼 클릭 이벤트
 document.getElementById('resetBtn').addEventListener('click', function () {
+    const filterDate = document.getElementById('filterDate').value; // YYYY-MM 형식
+    if (!filterDate) {
+        alert('삭제할 월을 입력하세요!');
+        return;
+    }
+
+    if (confirm(`${filterDate}에 해당하는 데이터를 삭제하시겠습니까?`)) {
+        // 선택한 월에 해당하지 않는 데이터를 필터링
+        scheduleData = scheduleData.filter(item => !item.date.startsWith(filterDate));
+
+        // 로컬스토리지 업데이트
+        saveToLocalStorage();
+
+        // 테이블 업데이트
+        updateTable();
+
+        alert(`${filterDate}에 해당하는 데이터가 삭제되었습니다.`);
+    } else {
+        alert('삭제가 취소되었습니다.');
+    }
+});
+
+
+// 초기화 버튼 클릭 시 전체 데이터 표시
+document.getElementById('viewAllBtn').addEventListener('click', function () {
     updateTable(); // 전체 데이터로 테이블 초기화
 });
 
-// 페이지 로드 시 로컬스토리지 데이터 불러오기
-window.addEventListener('DOMContentLoaded', loadFromLocalStorage);
+// 페이지 로드 시 실행될 코드 통합
+window.addEventListener('DOMContentLoaded', () => {
+    // 로컬스토리지에서 데이터 불러오기
+    loadFromLocalStorage();
+
+    // 기본 날짜 설정
+    const today = new Date().toISOString().split('T')[0]; // 오늘 날짜
+    document.getElementById('date').value = today; // 기본 날짜 설정
+});
+
