@@ -124,7 +124,7 @@ function mergeSheet(year, month, title1, sheet1, title2, sheet2) {
 function download2File() {
     const year_month = document.getElementById("downloadMonth").value;
     const year = new Date(year_month).getFullYear();
-    const month = new Date(year_month).getMonth();
+    const month = new Date(year_month).getMonth() + 1;
 
     makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
     makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
@@ -133,7 +133,7 @@ function download2File() {
 function download1File() {
     const year_month = document.getElementById("downloadMonth").value;
     const year = new Date(year_month).getFullYear();
-    const month = new Date(year_month).getMonth();
+    const month = new Date(year_month).getMonth() + 1;
 
     const title1 = "예방정비 내용"
     const sheet1 = schedule2sheet(year, month);
