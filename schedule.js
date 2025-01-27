@@ -22,7 +22,6 @@ function getDayOfWeek(dateString) {
     return days[date.getDay()];
 }
 
-// 작업 시간 배정 함수
 function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunchEndTime) {
     let currentTime = startTime; // 작업 시작 시간
     let overflowTasks = []; // 초과 작업 저장 배열
@@ -61,9 +60,10 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
         let taskCompleted = false; // 작업 완료 여부
 
         while (taskDuration > 0) {
-            // 점심시간 처리
-            if (currentTime >= lunchStartTime && currentTime < lunchEndTime) {
-                currentTime = lunchEndTime;
+            // 점심시간 처리: 점심시간에 걸치는 경우 작업을 무조건 점심시간 종료 후로 이동
+            if (currentTime < lunchEndTime && addMinutes(currentTime, taskDuration) > lunchStartTime) {
+                currentTime = lunchEndTime; // 점심시간 이후로 강제 이동
+                continue;
             }
 
             const remainingTime = calculateMinutesBetween(currentTime, endTime);
@@ -105,9 +105,10 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
         let taskDuration = parseInt(task["시간"], 10);
 
         while (taskDuration > 0) {
-            // 점심시간 체크
-            if (overflowStartTime >= lunchStartTime && overflowStartTime < lunchEndTime) {
-                overflowStartTime = lunchEndTime;
+            // 점심시간 체크: 점심시간에 걸치는 경우 무조건 점심시간 이후로 이동
+            if (overflowStartTime < lunchEndTime && addMinutes(overflowStartTime, taskDuration) > lunchStartTime) {
+                overflowStartTime = lunchEndTime; // 점심시간 이후로 이동
+                continue;
             }
 
             const remainingTime = calculateMinutesBetween(overflowStartTime, endTime);
@@ -117,7 +118,7 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
                 const taskStartTime = overflowStartTime;
                 const taskEndTime = addMinutes(overflowStartTime, allocatableTime);
 
-                // 작업 배정
+                // 초과 작업 배정
                 task["시작시간"] = taskStartTime;
                 task["종료시간"] = taskEndTime;
                 taskDuration -= allocatableTime;
@@ -134,6 +135,7 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
 
     return overflowTasks; // 최종 초과 작업 반환
 }
+
 
 
 // 저장 버튼 클릭 이벤트
