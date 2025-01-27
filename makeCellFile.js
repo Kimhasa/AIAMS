@@ -1,10 +1,11 @@
 // 이 파일을 사용할때는 다른 라이브러리도 같이 추가해 줘야함.
 // <script src="FileSaver.min.js"></script>
 // <script src="xlsx.mini.min.js"></script>
+// <script src="jszip.min.js"></script>
 // <script src="makeCellFile.js"></script>
 
 //table = 삼차원 배열, filename = 파일명.확장자
-function makeCellFile(table, filename) {
+async function makeCellFile(table, filename) {
     // workbook 생성
     let wb = XLSX.utils.book_new();
 
@@ -28,16 +29,25 @@ function makeCellFile(table, filename) {
 
     // 엑셀 파일 쓰기
     let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-    // ArrayBuffer 만들어주는 함수
     function s2ab(s) {
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
         return buf;
     }
-    // 파일 다운로드
-    saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), filename);
+    let blob = new Blob([s2ab(wbout)]);
+
+    if (filename.split(".")[1] == "cell") {
+        const zipContent = await new JSZip().loadAsync(blob);
+        const oldStr = await zipContent.file("[Content_Types].xml").async("string");
+        const oldVal = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml";
+        const newVal = "application/vnd.ms-excel.sheet.macroEnabled.main+xml";
+        const newStr = oldStr.replace(oldVal, newVal);
+        zipContent.file("[Content_Types].xml", newStr);
+        blob = await zipContent.generateAsync({ type: "blob" });
+    }
+
+    saveAs(blob, filename);
 }
 
 function makeTestCellFile() {
@@ -126,14 +136,28 @@ function download2File() {
     const year = new Date(year_month).getFullYear();
     const month = new Date(year_month).getMonth() + 1;
 
-    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.xlsx`);
-    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.xlsx`);
+    const fileFormatNodeList = document.getElementsByName('fileFormat');
+    let fileFormat = "cell";
+    fileFormatNodeList.forEach((node) => {
+        if (node.checked)
+            fileFormat = node.value;
+    })
+
+    makeCellFile(schedule2sheet(year, month), `${year_month} 예방정비표.${fileFormat}`);
+    makeCellFile(overflowSchedules2sheet(year, month), `${year_month} 초과작업표.${fileFormat}`);
 }
 
 function download1File() {
     const year_month = document.getElementById("downloadMonth").value;
     const year = new Date(year_month).getFullYear();
     const month = new Date(year_month).getMonth() + 1;
+
+    const fileFormatNodeList = document.getElementsByName('fileFormat');
+    let fileFormat = "cell";
+    fileFormatNodeList.forEach((node) => {
+        if (node.checked)
+            fileFormat = node.value;
+    })
 
     const title1 = "예방정비 내용"
     const sheet1 = schedule2sheet(year, month);
@@ -143,5 +167,5 @@ function download1File() {
 
     const sheet = mergeSheet(year, month, title1, sheet1, title2, sheet2);
 
-    makeCellFile(sheet, `${year_month} 표.xlsx`);
+    makeCellFile(sheet, `${year_month} 표.${fileFormat}`);
 }
