@@ -15,9 +15,6 @@ let header = `
     <button class="btn green">
         <a href="download.html">내려받기</a>
     </button>
-    <button class="btn black">
-        <a href="manual.html">설명서</a>
-    </button>
 </div>`;
 
 document.writeln(header);
