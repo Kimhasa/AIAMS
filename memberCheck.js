@@ -27,20 +27,39 @@ function populateTable(schedule = []) {
                 <td><input type="checkbox" class="sub-checkbox" ${scheduleData.sub ? 'checked' : ''}></td>
             `;
             tbody.appendChild(row);
+        });
 
-            // 주작업자/보조작업자 동시 선택 방지
-            const mainCheckbox = row.querySelector('.main-checkbox');
-            const subCheckbox = row.querySelector('.sub-checkbox');
+    // 출근, 주작업자, 보조작업자 전체 체크기능
+    const workHeaderCheckbox = document.querySelector('th:nth-child(2) input[type="checkbox"]');
+    const mainHeaderCheckbox = document.querySelector('th:nth-child(3) input[type="checkbox"]');
+    const subHeaderCheckbox = document.querySelector('th:nth-child(4) input[type="checkbox"]');
 
-            mainCheckbox.addEventListener('change', () => {
-                if (mainCheckbox.checked) subCheckbox.checked = false;
-            });
-
-            subCheckbox.addEventListener('change', () => {
-                if (subCheckbox.checked) mainCheckbox.checked = false;
+    if (workHeaderCheckbox) {
+        workHeaderCheckbox.addEventListener('change', () => {
+            document.querySelectorAll('.work-checkbox').forEach(cb => {
+                cb.checked = workHeaderCheckbox.checked;
             });
         });
+    }
+
+    if (mainHeaderCheckbox) {
+        mainHeaderCheckbox.addEventListener('change', () => {
+            document.querySelectorAll('.main-checkbox').forEach(cb => {
+                cb.checked = mainHeaderCheckbox.checked;
+            });
+        });
+    }
+
+    if (subHeaderCheckbox) {
+        subHeaderCheckbox.addEventListener('change', () => {
+            document.querySelectorAll('.sub-checkbox').forEach(cb => {
+                cb.checked = subHeaderCheckbox.checked;
+            });
+        });
+    }
 }
+
+
 
 // 일정 불러오기 함수
 function loadSchedule(date) {
