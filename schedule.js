@@ -271,6 +271,33 @@ function deleteRow(index) {
     updateTable(); // 테이블 업데이트
 }
 
+// happy 체크박스 이벤트 처리 함수
+function handleHappyChange(checkboxId, startTime, endTime) {
+    document.getElementById(checkboxId).addEventListener("change", function () {
+        const startTimeInput = document.getElementById("startTime");
+        const endTimeInput = document.getElementById("endTime");
+
+        if (this.checked) {
+            startTimeInput.value = startTime;
+            endTimeInput.value = endTime;
+        } else {
+            startTimeInput.value = "";
+            endTimeInput.value = "";
+        }
+
+        // 다른 체크박스 해제 (하나만 선택 가능하도록)
+        document.querySelectorAll('.happy-checkbox').forEach(cb => {
+            if (cb.id !== checkboxId) cb.checked = false;
+        });
+    });
+}
+
+// 이벤트 리스너 등록
+handleHappyChange("happy1", "08:30", "17:30");
+handleHappyChange("happy2", "08:00", "17:30");
+handleHappyChange("happy3", "08:00", "16:00");
+
+
 // 점심시간 체크박스 이벤트
 document.getElementById("lunchTime").addEventListener("change", function () {
     const lunchStartInput = document.getElementById("lunchStartTime");
