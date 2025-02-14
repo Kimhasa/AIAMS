@@ -292,7 +292,7 @@ function handleHappyChange(checkboxId, startTime, endTime) {
     });
 }
 
-// 이벤트 리스너 등록
+// happy 이벤트 리스너 등록
 handleHappyChange("happy1", "08:30", "17:30");
 handleHappyChange("happy2", "08:00", "17:30");
 handleHappyChange("happy3", "08:00", "16:00");
