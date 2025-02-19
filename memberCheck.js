@@ -59,8 +59,6 @@ function populateTable(schedule = []) {
     }
 }
 
-
-
 // 일정 불러오기 함수
 function loadSchedule(date) {
     if (!date) {
@@ -76,8 +74,8 @@ function updateSchedules(date) {
     const schedules = JSON.parse(localStorage.getItem(schedulesKey)) || {};
     const workSchedules = JSON.parse(localStorage.getItem(workScheduleKey)) || {};
     const workScheduleData = workSchedules[date] || [];
-    const month = date.slice(0, 7); // yyyy-mm 형태의 월 추출
-    const day = parseInt(date.slice(-2), 10); // 날짜 추출
+    const month = date.slice(0, 7);
+    const day = parseInt(date.slice(-2), 10);
 
     if (!schedules[month]) {
         schedules[month] = { headers: [], [day]: [] };
@@ -85,67 +83,68 @@ function updateSchedules(date) {
 
     const dailySchedules = schedules[month][day] || [];
     const overflowKey = `overflow_${month}_${day}`;
-    const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey)) || [];
+    const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey)) || {};
 
-    // 일정표와 초과 일정표 개수 계산
-    const scheduleCount = dailySchedules.length > 0 ? 1 : 0;
-    const overflowCount = overflowSchedules.length > 0 ? 1 : 0;
+    console.log("초과 일정표 데이터:", overflowSchedules);
 
-    // 모든 작업자 데이터를 가져오기
+    // 🔹 모든 작업자 데이터를 가져오기
     const members = JSON.parse(localStorage.getItem(membersKey)) || [];
-    const mainWorkers = workScheduleData.filter(s => s.main === 1).map(s => members.find(m => m.id === s.idx));
-    const subWorkers = workScheduleData.filter(s => s.sub === 1).map(s => members.find(m => m.id === s.idx));
+    const mainWorkers = workScheduleData.filter(s => s.main === 1).map(s => members.find(m => m.id === s.idx)).filter(Boolean);
+    const subWorkers = workScheduleData.filter(s => s.sub === 1).map(s => members.find(m => m.id === s.idx)).filter(Boolean);
 
-    // 유효성 검사: 최소 작업자 수 확인
-    if (mainWorkers.length < 1 || subWorkers.length < 1) {
+    // 🔹 유효성 검사: 최소 작업자 수 확인
+    if (mainWorkers.length === 0 || subWorkers.length === 0) {
         alert(`주작업자와 보조작업자가 최소 1명 이상 필요합니다.`);
         return;
     }
 
-    // 주작업자와 보조작업자 균등 분배
-    const totalMainWorkers = mainWorkers.length;
-    const totalSubWorkers = subWorkers.length;
+    // ✅ 일정표 개수 계산 (기존 일정표 + 초과 일정표)
+    const totalSchedules = [dailySchedules, ...Object.values(overflowSchedules)];
+    const totalScheduleCount = totalSchedules.length;
 
-    const mainWorkersForDaily = mainWorkers.slice(0, Math.ceil(totalMainWorkers / 2)).map(worker => worker?.name || "미지정");
-    const mainWorkersForOverflow = mainWorkers.slice(Math.ceil(totalMainWorkers / 2)).map(worker => worker?.name || "미지정");
+    console.log("총 일정표 개수:", totalScheduleCount);
 
-    const subWorkersForDaily = subWorkers.slice(0, Math.ceil(totalSubWorkers / 2)).map(worker => worker?.name || "미지정");
-    const subWorkersForOverflow = subWorkers.slice(Math.ceil(totalSubWorkers / 2)).map(worker => worker?.name || "미지정");
+    // ✅ 일정표별 주작업자/보조작업자 그룹 나누기
+    function distributeWorkers(workers, scheduleCount) {
+        if (scheduleCount === 0) return [];
+        if (workers.length === 0) return Array(scheduleCount).fill(["미지정"]);
 
-    // 기존표 작업자 배치
-    if (scheduleCount > 0) {
-        dailySchedules.forEach(entry => {
-            entry["주작업자"] = mainWorkersForDaily.join(", "); // 기존표 주작업자
-            entry["보조작업자"] = subWorkersForDaily.join(", "); // 기존표 보조작업자
-        });
+        const baseCount = Math.floor(workers.length / scheduleCount); // 기본 배정 인원
+        const remainder = workers.length % scheduleCount; // 추가 배정할 인원
+        let distributed = [];
+        let index = 0;
+
+        for (let i = 0; i < scheduleCount; i++) {
+            let assignCount = baseCount + (i < remainder ? 1 : 0); // 앞쪽 일정표부터 추가 배정
+            distributed.push(workers.slice(index, index + assignCount).map(w => w?.name || "미지정"));
+            index += assignCount;
+        }
+
+        return distributed;
     }
 
-    // 초과표 작업자 배치
-    if (overflowCount > 0 || mainWorkersForOverflow.length > 0 || subWorkersForOverflow.length > 0) {
-        overflowSchedules.forEach(entry => {
-            entry["주작업자"] = mainWorkersForOverflow.join(", "); // 초과표 주작업자
-            entry["보조작업자"] = subWorkersForOverflow.join(", "); // 초과표 보조작업자
-        });
-    } else {
-        // 초과표가 필요 없는 경우, 삭제
-        localStorage.removeItem(overflowKey);
-    }
+    // ✅ 일정표별 작업자 그룹 할당
+    const scheduleMainGroups = distributeWorkers(mainWorkers, totalScheduleCount);
+    const scheduleSubGroups = distributeWorkers(subWorkers, totalScheduleCount);
 
-    // 저장
+    // ✅ 일정표 내부의 작업에 배정
+    totalSchedules.forEach((schedule, scheduleIndex) => {
+        if (Array.isArray(schedule)) {
+            schedule.forEach(task => {
+                task["주작업자"] = scheduleMainGroups[scheduleIndex]?.join(", ") || "미지정";
+                task["보조작업자"] = scheduleSubGroups[scheduleIndex]?.join(", ") || "미지정";
+            });
+        }
+    });
+
+    // ✅ 일정 데이터 저장
     schedules[month][day] = dailySchedules;
     localStorage.setItem(schedulesKey, JSON.stringify(schedules));
-    if (overflowSchedules.length > 0) {
-        localStorage.setItem(overflowKey, JSON.stringify(overflowSchedules));
-    }
+    localStorage.setItem(overflowKey, JSON.stringify(overflowSchedules));
 
-    console.log("기존 작업표:", dailySchedules);
-    if (overflowSchedules.length > 0) {
-        console.log("초과 작업표:", overflowSchedules);
-    } else {
-        console.log("초과 작업표 없음.");
-    }
+    console.log("배정된 주작업자 그룹:", scheduleMainGroups);
+    console.log("배정된 보조작업자 그룹:", scheduleSubGroups);
 }
-
 
 
 // 일정 저장

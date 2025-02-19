@@ -23,8 +23,9 @@ function getDayOfWeek(dateString) {
 }
 
 function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunchEndTime) {
-    let currentTime = startTime; // 작업 시작 시간
-    let overflowTasks = []; // 초과 작업 저장 배열
+    let currentTime = startTime;
+    let overflowSchedules = [];
+    let overflowTasks = [];
 
     function addMinutes(time, minutes) {
         const [hours, mins] = time.split(":").map(Number);
@@ -37,43 +38,39 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
     function calculateMinutesBetween(startTime, endTime) {
         const [startHours, startMinutes] = startTime.split(":").map(Number);
         const [endHours, endMinutes] = endTime.split(":").map(Number);
-
-        const start = startHours * 60 + startMinutes;
-        const end = endHours * 60 + endMinutes;
-
-        return end - start;
+        return (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
     }
 
-    // 작업 배정을 위한 반복
+    function isOverlappingLunch(startTime, duration) {
+        const taskEndTime = addMinutes(startTime, duration);
+        return startTime < lunchEndTime && taskEndTime > lunchStartTime;
+    }
+
     for (let i = 0; i < schedule.length; ) {
         let item = schedule[i];
-        let taskDuration = parseInt(item["시간"], 10); // 작업 소요 시간
+        let taskDuration = parseInt(item["시간"], 10);
 
-        // 남은 시간을 계산하여 초과 작업 여부 판단
         const remainingTimeToEnd = calculateMinutesBetween(currentTime, endTime);
         if (taskDuration > remainingTimeToEnd) {
             overflowTasks.push({ ...item });
             schedule.splice(i, 1);
-            continue; // 다음 작업으로 이동
+            continue;
         }
 
-        let taskCompleted = false; // 작업 완료 여부
+        let taskCompleted = false;
 
         while (taskDuration > 0) {
-            // 점심시간 처리: 점심시간에 걸치는 경우 작업을 무조건 점심시간 종료 후로 이동
-            if (currentTime < lunchEndTime && addMinutes(currentTime, taskDuration) > lunchStartTime) {
-                currentTime = lunchEndTime; // 점심시간 이후로 강제 이동
+            if (isOverlappingLunch(currentTime, taskDuration)) {
+                currentTime = lunchEndTime;
                 continue;
             }
 
             const remainingTime = calculateMinutesBetween(currentTime, endTime);
-
             if (remainingTime > 0) {
                 const allocatableTime = Math.min(taskDuration, remainingTime);
                 const taskStartTime = currentTime;
                 const taskEndTime = addMinutes(currentTime, allocatableTime);
 
-                // 작업 배정
                 item["시작시간"] = taskStartTime;
                 item["종료시간"] = taskEndTime;
                 taskDuration -= allocatableTime;
@@ -88,54 +85,63 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
             }
         }
 
-        // 작업이 끝나지 않은 경우 초과 작업으로 분류
         if (!taskCompleted && taskDuration > 0) {
             const overflowTask = { ...item };
             overflowTask["시간"] = taskDuration;
             overflowTasks.push(overflowTask);
-            schedule.splice(i, 1); // 초과 작업에서 제거
+            schedule.splice(i, 1);
         } else {
             i++;
         }
     }
 
-    // 초과 작업을 기존 **시작 시간부터** 재배정
-    let overflowStartTime = startTime; // 초과 작업 시작 시간 초기화
-    overflowTasks.forEach(task => {
-        let taskDuration = parseInt(task["시간"], 10);
+    // 초과 작업에서도 빈 시간 확인 후, 뒤의 작업을 당겨서 배정
+    let overflowIndex = 1;
+    let overflowStartTime = startTime;
 
-        while (taskDuration > 0) {
-            // 점심시간 체크: 점심시간에 걸치는 경우 무조건 점심시간 이후로 이동
-            if (overflowStartTime < lunchEndTime && addMinutes(overflowStartTime, taskDuration) > lunchStartTime) {
-                overflowStartTime = lunchEndTime; // 점심시간 이후로 이동
-                continue;
-            }
+    while (overflowTasks.length > 0) {
+        let newOverflowList = [];
+        let remainingOverflowTasks = [];
 
-            const remainingTime = calculateMinutesBetween(overflowStartTime, endTime);
+        overflowTasks.sort((a, b) => parseInt(a["시간"]) - parseInt(b["시간"])); // 짧은 작업부터 배정
 
-            if (remainingTime > 0) {
-                const allocatableTime = Math.min(taskDuration, remainingTime);
-                const taskStartTime = overflowStartTime;
-                const taskEndTime = addMinutes(overflowStartTime, allocatableTime);
+        while (overflowTasks.length > 0) {
+            let task = overflowTasks.shift();
+            let taskDuration = parseInt(task["시간"], 10);
 
-                // 초과 작업 배정
-                task["시작시간"] = taskStartTime;
-                task["종료시간"] = taskEndTime;
-                taskDuration -= allocatableTime;
-                overflowStartTime = taskEndTime;
+            while (taskDuration > 0) {
+                if (isOverlappingLunch(overflowStartTime, taskDuration)) {
+                    overflowStartTime = lunchEndTime;
+                    continue;
+                }
 
-                if (taskDuration === 0) {
+                const remainingTime = calculateMinutesBetween(overflowStartTime, endTime);
+                if (remainingTime > 0) {
+                    const allocatableTime = Math.min(taskDuration, remainingTime);
+                    const taskStartTime = overflowStartTime;
+                    const taskEndTime = addMinutes(overflowStartTime, allocatableTime);
+
+                    let newTask = { ...task, "시작시간": taskStartTime, "종료시간": taskEndTime };
+                    newOverflowList.push(newTask);
+
+                    taskDuration -= allocatableTime;
+                    overflowStartTime = taskEndTime;
+                } else {
+                    remainingOverflowTasks.push({ ...task, "시간": taskDuration });
                     break;
                 }
-            } else {
-                break; // 더 이상 배정할 시간이 없으면 루프 종료
             }
         }
-    });
 
-    return overflowTasks; // 최종 초과 작업 반환
+        overflowTasks = remainingOverflowTasks;
+        overflowSchedules.push(newOverflowList);
+
+        overflowIndex++;
+        overflowStartTime = startTime;
+    }
+
+    return overflowSchedules;
 }
-
 
 
 // 저장 버튼 클릭 이벤트
@@ -211,10 +217,7 @@ document.getElementById("saveBtn").addEventListener("click", function () {
     updateTable();
 });
 
-
-
 // 테이블 업데이트 함수
-// 테이블 업데이트 함수 (수정 기능 제거)
 function updateTable(filteredData = null) {
     const tbody = document.getElementById('scheduleTableBody');
     tbody.innerHTML = ''; // 기존 행 초기화
@@ -247,21 +250,6 @@ function preventEnter(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // 기본 Enter 동작 방지
     }
-}
-
-// 필드 수정 및 저장 함수
-function updateAndSaveField(index, field, value) {
-    if (field === 'date') {
-        scheduleData[index].day = getDayOfWeek(value); // 날짜 변경 시 요일 자동 업데이트
-    }
-    scheduleData[index][field] = value; // 데이터 업데이트
-
-    // 데이터 정렬 (내림차순)
-    scheduleData.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    saveToLocalStorage(); // 로컬스토리지에 저장
-    updateStorageInfo();  // 저장 공간 정보 업데이트
-    updateTable(); // 테이블 업데이트 (화면에 반영)
 }
 
 // 행 삭제 함수

@@ -127,71 +127,113 @@ function renderScheduleForDay(month, day) {
 }
 
 function renderOverflowSchedule(month, day) {
-    const overflowKey = `overflow_${month}_${day}`;
-    const overflowSchedules = JSON.parse(localStorage.getItem(overflowKey) || "[]");
     const overflowContainer = document.getElementById("overflow");
     overflowContainer.innerHTML = ""; // 기존 결과 초기화
 
-    if (overflowSchedules.length === 0) {
+    let hasOverflowData = false;
+
+    // 저장된 모든 키 가져오기
+    const allKeys = Object.keys(localStorage);
+
+    // 현재 날짜(`overflow_YYYY-MM-DD`)에 맞는 초과 작업 키 필터링
+    const matchingKeys = allKeys.filter(key => key.startsWith(`overflow_${month}_${day}`));
+
+    if (matchingKeys.length === 0) {
         overflowContainer.innerHTML = `<p>${day}일에 초과 작업이 없습니다.</p>`;
         return;
     }
 
-    // 테이블 생성
-    const table = document.createElement("table");
-    table.style.width = "80%";
-    table.style.borderCollapse = "collapse";
-    table.border = "1";
+    // 필터링된 모든 초과 일정표 출력
+    matchingKeys.forEach((overflowKey, index) => {
+        const rawData = localStorage.getItem(overflowKey);
+        if (!rawData) return;
 
-    // 동적 헤더 생성
-    const headers = Object.keys(overflowSchedules[0]); // 첫 번째 항목의 키를 기준으로 헤더 생성
-    const thead = document.createElement("thead");
-    const headerRow = document.createElement("tr");
+        const parsedData = JSON.parse(rawData); // 여기서 parsedData는 [[{...}], [{...}]]
 
-    headers.forEach(header => {
-        const th = document.createElement("th");
-        th.innerText = header.trim();
-        th.style.border = "1px solid #ddd";
-        th.style.padding = "8px";
-        th.style.backgroundColor = "#f4f4f4"; // 기존 표와 동일한 헤더 배경색
-        headerRow.appendChild(th);
-    });
+        parsedData.forEach((scheduleGroup, groupIndex) => {
+            if (!scheduleGroup.length) return;
 
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+            hasOverflowData = true;
 
-    // 본문 생성
-    const tbody = document.createElement("tbody");
-    overflowSchedules.forEach(rowData => {
-        const row = document.createElement("tr");
+            // 개별 초과 일정표를 감싸는 박스 생성
+            const overflowBox = document.createElement("div");
+            overflowBox.style.marginBottom = "20px";
 
-        headers.forEach(header => {
-            const td = document.createElement("td");
-            td.innerText = rowData[header.trim()] || "N/A"; // 헤더에 맞는 데이터 삽입
-            td.style.border = "1px solid #ddd"; // 셀 테두리
-            td.style.padding = "8px"; // 셀 패딩
-            row.appendChild(td);
+            // 테이블 제목 추가
+            const tableTitle = document.createElement("h3");
+            tableTitle.innerText = `초과 작업표 - 그룹 ${groupIndex + 1}`;
+            tableTitle.style.textAlign = "center";
+            tableTitle.style.color = "#333";
+            overflowBox.appendChild(tableTitle);
+
+            // 테이블 생성 (renderScheduleForDay()와 동일한 디자인)
+            const table = document.createElement("table");
+            table.style.width = "80%";
+            table.style.borderCollapse = "collapse";
+            table.border = "1";
+
+            // 동적 헤더 생성
+            const headers = Object.keys(scheduleGroup[0]);
+            const thead = document.createElement("thead");
+            const headerRow = document.createElement("tr");
+
+            headers.forEach(header => {
+                const th = document.createElement("th");
+                th.innerText = header.trim();
+                th.style.border = "1px solid #ddd";
+                th.style.padding = "8px";
+                th.style.backgroundColor = "#f4f4f4";
+                headerRow.appendChild(th);
+            });
+
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // 본문 생성
+            const tbody = document.createElement("tbody");
+            scheduleGroup.forEach(rowData => {
+                const row = document.createElement("tr");
+
+                headers.forEach(header => {
+                    const td = document.createElement("td");
+
+                    // ✅ 주작업자 & 보조작업자 필드 처리
+                    if (header.trim() === "주작업자" || header.trim() === "보조작업자") {
+                        td.innerText = rowData[header]?.toString().trim() || "N/A";
+                    } else {
+                        td.innerText = rowData[header.trim()] || "N/A";
+                    }
+
+                    td.style.border = "1px solid #ddd";
+                    td.style.padding = "8px";
+                    row.appendChild(td);
+                });
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+            overflowBox.appendChild(table); // 개별 박스에 테이블 추가
+            overflowContainer.appendChild(overflowBox); // 전체 컨테이너에 추가
         });
-
-        tbody.appendChild(row);
     });
 
-    table.appendChild(tbody);
-    overflowContainer.appendChild(table);
+    if (!hasOverflowData) {
+        overflowContainer.innerHTML = `<p>${day}일에 초과 작업이 없습니다.</p>`;
+    }
 }
 
 // 날짜 변경 및 렌더링
 function updateDate(date) {
+
     currentDate = date;
     const [year, month, day] = currentDate.split("-");
     const selectedMonth = `${year}-${month}`;
     const selectedDay = parseInt(day, 10);
 
-    // 선택한 날짜의 데이터를 렌더링
     renderScheduleForDay(selectedMonth, selectedDay); // 예방정비 표 렌더링
     renderOverflowSchedule(selectedMonth, selectedDay); // 초과작업 표 렌더링
 }
-
 
 // 이전 날짜로 이동
 function prevDay() {

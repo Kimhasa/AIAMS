@@ -176,3 +176,25 @@ input[type="time"]{
 .table-container {
     margin-bottom: 100px;
 }
+
+/* 인원 입력 input 크기 조절 */
+.personnel-table input[type="text"] {
+    width: 150px; /* 가로 크기 조절 */
+    height: 30px; /* 세로 크기 조절 */
+    font-size: 16px; /* 글자 크기 */
+    padding: 5px; /* 내부 여백 */
+}
+
+/* 체크박스 크기 조절 */
+.personnel-table .leader-checkbox {
+    width: 20px;  /* 가로 크기 */
+    height: 20px; /* 세로 크기 */
+    transform: scale(1.3); /* 크기 확대 */
+}
+/* 체크박스 크기 조정 */
+input[type="checkbox"] {
+    width: 20px;   /* 가로 크기 */
+    height: 20px;  /* 세로 크기 */
+    transform: scale(1.3); /* 크기 확대 (1.3배) */
+    margin: 5px; /* 간격 조정 */
+}
