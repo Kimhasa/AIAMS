@@ -51,98 +51,60 @@ function distributeTaskTimes(schedule, startTime, endTime, lunchStartTime, lunch
         let taskDuration = parseInt(item["시간"], 10);
 
         const remainingTimeToEnd = calculateMinutesBetween(currentTime, endTime);
+
         if (taskDuration > remainingTimeToEnd) {
             overflowTasks.push({ ...item });
             schedule.splice(i, 1);
             continue;
         }
 
-        let taskCompleted = false;
-
-        while (taskDuration > 0) {
-            if (isOverlappingLunch(currentTime, taskDuration)) {
-                currentTime = lunchEndTime;
-                continue;
-            }
-
-            const remainingTime = calculateMinutesBetween(currentTime, endTime);
-            if (remainingTime > 0) {
-                const allocatableTime = Math.min(taskDuration, remainingTime);
-                const taskStartTime = currentTime;
-                const taskEndTime = addMinutes(currentTime, allocatableTime);
-
-                item["시작시간"] = taskStartTime;
-                item["종료시간"] = taskEndTime;
-                taskDuration -= allocatableTime;
-                currentTime = taskEndTime;
-
-                if (taskDuration === 0) {
-                    taskCompleted = true;
-                    break;
-                }
-            } else {
-                break;
-            }
+        if (isOverlappingLunch(currentTime, taskDuration)) {
+            currentTime = lunchEndTime;
         }
 
-        if (!taskCompleted && taskDuration > 0) {
-            const overflowTask = { ...item };
-            overflowTask["시간"] = taskDuration;
-            overflowTasks.push(overflowTask);
-            schedule.splice(i, 1);
-        } else {
-            i++;
-        }
+        const taskStartTime = currentTime;
+        const taskEndTime = addMinutes(currentTime, taskDuration);
+
+        item["시작시간"] = taskStartTime;
+        item["종료시간"] = taskEndTime;
+        currentTime = taskEndTime;
+
+        i++;
     }
 
-    // 초과 작업에서도 빈 시간 확인 후, 뒤의 작업을 당겨서 배정
-    let overflowIndex = 1;
-    let overflowStartTime = startTime;
-
+    // 초과 작업 처리
     while (overflowTasks.length > 0) {
         let newOverflowList = [];
         let remainingOverflowTasks = [];
+        let overflowStartTime = startTime;
 
-        overflowTasks.sort((a, b) => parseInt(a["시간"]) - parseInt(b["시간"])); // 짧은 작업부터 배정
-
-        while (overflowTasks.length > 0) {
-            let task = overflowTasks.shift();
+        overflowTasks.forEach(task => {
             let taskDuration = parseInt(task["시간"], 10);
+            const remainingTimeToEnd = calculateMinutesBetween(overflowStartTime, endTime);
 
-            while (taskDuration > 0) {
-                if (isOverlappingLunch(overflowStartTime, taskDuration)) {
-                    overflowStartTime = lunchEndTime;
-                    continue;
-                }
-
-                const remainingTime = calculateMinutesBetween(overflowStartTime, endTime);
-                if (remainingTime > 0) {
-                    const allocatableTime = Math.min(taskDuration, remainingTime);
-                    const taskStartTime = overflowStartTime;
-                    const taskEndTime = addMinutes(overflowStartTime, allocatableTime);
-
-                    let newTask = { ...task, "시작시간": taskStartTime, "종료시간": taskEndTime };
-                    newOverflowList.push(newTask);
-
-                    taskDuration -= allocatableTime;
-                    overflowStartTime = taskEndTime;
-                } else {
-                    remainingOverflowTasks.push({ ...task, "시간": taskDuration });
-                    break;
-                }
+            if (taskDuration > remainingTimeToEnd) {
+                remainingOverflowTasks.push({ ...task });
+                return;
             }
-        }
 
-        overflowTasks = remainingOverflowTasks;
+            if (isOverlappingLunch(overflowStartTime, taskDuration)) {
+                overflowStartTime = lunchEndTime;
+            }
+
+            const taskStartTime = overflowStartTime;
+            const taskEndTime = addMinutes(overflowStartTime, taskDuration);
+
+            newOverflowList.push({ ...task, "시작시간": taskStartTime, "종료시간": taskEndTime });
+
+            overflowStartTime = taskEndTime;
+        });
+
         overflowSchedules.push(newOverflowList);
-
-        overflowIndex++;
-        overflowStartTime = startTime;
+        overflowTasks = remainingOverflowTasks;
     }
 
     return overflowSchedules;
 }
-
 
 // 저장 버튼 클릭 이벤트
 document.getElementById("saveBtn").addEventListener("click", function () {
