@@ -161,7 +161,7 @@ function renderOverflowSchedule(month, day) {
 
             // 테이블 제목 추가
             const tableTitle = document.createElement("h3");
-            tableTitle.innerText = `초과 작업표 - 그룹 ${groupIndex + 1}`;
+            tableTitle.innerText = `초과 작업표 - ${groupIndex + 1}`;
             tableTitle.style.textAlign = "center";
             tableTitle.style.color = "#333";
             overflowBox.appendChild(tableTitle);
