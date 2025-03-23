@@ -40,3 +40,31 @@
 
 즉, **일정표를 순차적으로 돌며 남은 인원을 하나씩 추가 배치**하는 방식.
 
+### 프로젝트 화면
+
+|  |  |
+|:---:|:---:|
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/243622f2-c87a-4bdb-bdad-bd4d747351e1" /><br>인원 입력 화면| <img width="400" height="400" src="https://github.com/user-attachments/assets/25c09f58-4d66-4ca3-b6ce-39ce774f6261" /><br>작업지시 화면 -1|
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/4650bb60-5500-4f95-aede-6775d686b46c" /><br>작업지시 화면 -2 | <img width="400" height="400" src="https://github.com/user-attachments/assets/33b63d96-6814-456a-b4c8-9dd14d99e06b" /><br>일과시간 지정 화면 |
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/1d19c7d0-93f4-4e0a-9af3-2d0323e989f7" /><br>인원 배정 화면 | <img width="400" height="400" src="https://github.com/user-attachments/assets/7291c58d-a23e-4bf6-af37-ea38e982c52d" /><br>Excell, 한셀 파일 다운 화면 |
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/a614b746-d26c-48e0-9bfd-f0cd99a3cd44" /><br>내려받은 데이터 엑셀 화면 |  |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
