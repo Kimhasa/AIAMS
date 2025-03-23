@@ -67,6 +67,8 @@
 | <img width="400" height="400" src="https://github.com/user-attachments/assets/a614b746-d26c-48e0-9bfd-f0cd99a3cd44" /><br>다운로드 받은 엑셀 화면 |  |
 
 
+<img width="349" alt="Image" src="https://github.com/user-attachments/assets/26bb4aad-b171-43bd-8f03-a1101a7e37ed" />
+
 
 
 
