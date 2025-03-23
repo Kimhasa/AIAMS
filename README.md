@@ -4,9 +4,11 @@
   
 * 로컬스토리지로 데이터를 저장하기 때문에 인터넷 연결이 필요 없음
 
+* 기존에는 하루의 작업 일정을 일일이 수작업으로 배정하고 계산해야 했으나(약 2시간 ~ 3시간 소요), 이 시스템을 통해 간단한 클릭 몇 번으로 신속하고 정확한 일정 관리와 자동 시간 계산이 가능해짐 
+
 ---------------------------------------------------------------------
 
-### 프로젝트 구성
+### 기술스택
 
 * html5, css3, javascript, FileSaver.js, SheetJS(xlsx.js)
 
@@ -53,14 +55,15 @@
 
 즉, **일정표를 순차적으로 돌며 남은 인원을 하나씩 추가 배치**하는 방식.
 
+
 ### 프로젝트 화면
 
 |  |  |
 |:---:|:---:|
 | <img width="400" height="400" src="https://github.com/user-attachments/assets/243622f2-c87a-4bdb-bdad-bd4d747351e1" /><br>인원 입력 화면| <img width="400" height="400" src="https://github.com/user-attachments/assets/25c09f58-4d66-4ca3-b6ce-39ce774f6261" /><br>작업지시 화면 -1|
 | <img width="400" height="400" src="https://github.com/user-attachments/assets/4650bb60-5500-4f95-aede-6775d686b46c" /><br>작업지시 화면 -2 | <img width="400" height="400" src="https://github.com/user-attachments/assets/33b63d96-6814-456a-b4c8-9dd14d99e06b" /><br>일과시간 지정 화면 |
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/1d19c7d0-93f4-4e0a-9af3-2d0323e989f7" /><br>인원 배정 화면 | <img width="400" height="400" src="https://github.com/user-attachments/assets/7291c58d-a23e-4bf6-af37-ea38e982c52d" /><br>Excell, 한셀 파일 다운 화면 |
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/a614b746-d26c-48e0-9bfd-f0cd99a3cd44" /><br>내려받은 데이터 엑셀 화면 |  |
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/1d19c7d0-93f4-4e0a-9af3-2d0323e989f7" /><br>인원 배정 화면 | <img width="400" height="400" src="https://github.com/user-attachments/assets/7291c58d-a23e-4bf6-af37-ea38e982c52d" /><br>Excel, 한셀 파일 다운 화면 |
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/a614b746-d26c-48e0-9bfd-f0cd99a3cd44" /><br>다운로드 받은 엑셀 화면 |  |
 
 
 
