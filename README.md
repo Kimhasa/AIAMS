@@ -61,14 +61,10 @@
 
 |  |  |
 |:---:|:---:|
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/243622f2-c87a-4bdb-bdad-bd4d747351e1" /><br>인원 입력 화면| <img width="400" height="400" src="https://github.com/user-attachments/assets/25c09f58-4d66-4ca3-b6ce-39ce774f6261" /><br>작업지시 화면 -1|
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/4650bb60-5500-4f95-aede-6775d686b46c" /><br>작업지시 화면 -2 | <img width="400" height="400" src="https://github.com/user-attachments/assets/33b63d96-6814-456a-b4c8-9dd14d99e06b" /><br>일과시간 지정 화면 |
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/1d19c7d0-93f4-4e0a-9af3-2d0323e989f7" /><br>인원 배정 화면 | <img width="400" height="400" src="https://github.com/user-attachments/assets/7291c58d-a23e-4bf6-af37-ea38e982c52d" /><br>Excel, 한셀 파일 다운 화면 |
-| <img width="400" height="400" src="https://github.com/user-attachments/assets/a614b746-d26c-48e0-9bfd-f0cd99a3cd44" /><br>다운로드 받은 엑셀 화면 |  |
-
-
-<img width="349" alt="Image" src="https://github.com/user-attachments/assets/26bb4aad-b171-43bd-8f03-a1101a7e37ed" />
-
+| <img width="400" height="400" src="https://github.com/user-attachments/assets/243622f2-c87a-4bdb-bdad-bd4d747351e1" /><br>인원 입력 화면| <img width="688" alt="Image" src="https://github.com/user-attachments/assets/3c9ec463-5d3f-4f43-8a43-ca8a6a5063b2" /><br>작업지시 화면 -1|
+| <img width="683" alt="Image" src="https://github.com/user-attachments/assets/e67f344b-bdd4-4066-bae6-57fa723ed60a" /><br>작업지시 화면 -2 | <img width="514" alt="Image" src="https://github.com/user-attachments/assets/ed64d5a7-2f9c-4199-823f-b61f43320ad1" /><br>일과시간 지정 화면 |
+| <img width="347" alt="Image" src="https://github.com/user-attachments/assets/3fe2f079-803b-49f1-89d7-f13254964113" /><br>인원 배정 화면 | <img width="315" alt="Image" src="https://github.com/user-attachments/assets/db4e6d3a-2870-4a52-958c-1aefcb80625a" /><br>Excel, 한셀 파일 다운 화면 |
+| <img width="495" alt="Image" src="https://github.com/user-attachments/assets/d33de20c-f8b4-4639-8f8b-2a82894beaa4" /><br>다운로드 받은 엑셀 화면 |  |
 
 
 
