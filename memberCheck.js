@@ -87,24 +87,24 @@ function updateSchedules(date) {
 
     console.log("초과 일정표 데이터:", overflowSchedules);
 
-    // 🔹 모든 작업자 데이터를 가져오기
+    // 모든 작업자 데이터를 가져오기
     const members = JSON.parse(localStorage.getItem(membersKey)) || [];
     const mainWorkers = workScheduleData.filter(s => s.main === 1).map(s => members.find(m => m.id === s.idx)).filter(Boolean);
     const subWorkers = workScheduleData.filter(s => s.sub === 1).map(s => members.find(m => m.id === s.idx)).filter(Boolean);
 
-    // 🔹 유효성 검사: 최소 작업자 수 확인
+    // 유효성 검사: 최소 작업자 수 확인
     if (mainWorkers.length === 0 || subWorkers.length === 0) {
         alert(`주작업자와 보조작업자가 최소 1명 이상 필요합니다.`);
         return;
     }
 
-    // ✅ 일정표 개수 계산 (기존 일정표 + 초과 일정표)
+    // 일정표 개수 계산 (기존 일정표 + 초과 일정표)
     const totalSchedules = [dailySchedules, ...Object.values(overflowSchedules)];
     const totalScheduleCount = totalSchedules.length;
 
     console.log("총 일정표 개수:", totalScheduleCount);
 
-    // ✅ 일정표별 주작업자/보조작업자 그룹 나누기
+    // 일정표별 주작업자/보조작업자 그룹 나누기
     function distributeWorkers(workers, scheduleCount) {
         if (scheduleCount === 0) return [];
         if (workers.length === 0) return Array(scheduleCount).fill(["미지정"]);
@@ -123,11 +123,11 @@ function updateSchedules(date) {
         return distributed;
     }
 
-    // ✅ 일정표별 작업자 그룹 할당
+    // 일정표별 작업자 그룹 할당
     const scheduleMainGroups = distributeWorkers(mainWorkers, totalScheduleCount);
     const scheduleSubGroups = distributeWorkers(subWorkers, totalScheduleCount);
 
-    // ✅ 일정표 내부의 작업에 배정
+    // 일정표 내부의 작업에 배정
     totalSchedules.forEach((schedule, scheduleIndex) => {
         if (Array.isArray(schedule)) {
             schedule.forEach(task => {
@@ -137,7 +137,7 @@ function updateSchedules(date) {
         }
     });
 
-    // ✅ 일정 데이터 저장
+    // 일정 데이터 저장
     schedules[month][day] = dailySchedules;
     localStorage.setItem(schedulesKey, JSON.stringify(schedules));
     localStorage.setItem(overflowKey, JSON.stringify(overflowSchedules));
