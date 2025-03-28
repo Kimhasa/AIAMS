@@ -99,13 +99,15 @@ function overflowSchedules2sheet(year, month) {
             continue;
         }
 
-        const headers = Object.keys(overflowSchedules[0]);
-        const data = [headers];
-        overflowSchedules.forEach(rowData => {
-            const row = headers.map(header => rowData[header.trim()] || "N/A");
-            data.push(row);
-        });
-
+        const data = [];
+        overflowSchedules.forEach((table, index) => {
+            const scheduleHeaders = Object.keys(table[0]) || [];
+            data.push([`초과 작업표 - 그룹 ${index + 1}`]);
+            data.push(scheduleHeaders);
+            table.forEach(rowData => {
+                data.push(scheduleHeaders.map(header => rowData[header.trim()] || "N/A"));
+            });
+        })
         sheets.push(data);
     }
 
